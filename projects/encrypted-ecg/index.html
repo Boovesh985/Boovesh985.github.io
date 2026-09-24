@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Encrypted ECG Diagnosis — Booveshwaran T</title>
+    <meta name="description" content="Arrhythmia classification on homomorphically encrypted ECG signals, explained with SHAP. The cloud never sees a patient's raw heartbeat." />
+    <meta name="theme-color" content="#0E1114" />
+    <meta property="og:title" content="Encrypted ECG Diagnosis — Booveshwaran T" />
+    <meta property="og:description" content="Arrhythmia classification on homomorphically encrypted ECG signals, explained with SHAP. The cloud never sees a patient's raw heartbeat." />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script>try{if(sessionStorage.getItem('bt-transition'))document.documentElement.classList.add('is-arriving')}catch(e){}</script>
+  </head>
+  <body data-page="project" data-shape="3">
+    <div class="curtain" aria-hidden="true"><span class="curtain__label mono"></span><div class="curtain__bar"><i></i></div></div>
+    <canvas class="gl" aria-hidden="true"></canvas>
+    <div class="cursor" aria-hidden="true"><div class="cursor__ring"><span class="cursor__label"></span></div><div class="cursor__dot"></div></div>
+
+    <header class="nav">
+      <a href="/" class="nav__brand" data-transition="Home" data-magnetic aria-label="Home">
+        <span class="nav__mark">BT</span>
+        <span class="nav__name mono js-hover-scramble">Booveshwaran T</span>
+      </a>
+      <nav class="nav__links mono" aria-label="Primary">
+        <a href="/#work" data-transition="Selected work" class="js-hover-scramble">Work</a>
+        <a href="/#about" data-transition="About" class="js-hover-scramble">About</a>
+        <a href="/#contact" data-transition="Contact" class="js-hover-scramble">Contact</a>
+      </nav>
+      <div class="nav__time mono"><span class="dot"></span><span class="js-clock">--:--</span> IST</div>
+    </header>
+
+    <main id="top" class="cs" data-accent="bronze">
+      <section class="cs-hero" data-shape="3" data-theme="dark">
+        <a class="cs-back mono js-hero-fade" href="/#work" data-transition="Selected work">← All work</a>
+        <div class="cs-hero__main">
+          <p class="chapter__label mono js-decode">Privacy-preserving ML · Cardiology</p>
+          <h1 class="cs-title" aria-label="Encrypted ECG Diagnosis">
+            <span class="hero__name-inner"><span class="hero__layer hero__layer--cipher" aria-hidden="true">Encrypted<br />ECG Diagnosis</span><span class="hero__layer hero__layer--plain" aria-hidden="true">Encrypted<br />ECG Diagnosis</span></span>
+          </h1>
+          <p class="cs-summary js-hero-fade">Arrhythmia classification on homomorphically encrypted ECG signals, explained with SHAP. The cloud never sees a patient's raw heartbeat.</p>
+        </div>
+        <dl class="cs-meta mono js-hero-fade">
+          <div><dt>Year</dt><dd>2026</dd></div>
+          <div><dt>Discipline</dt><dd>Privacy-preserving ML · Cardiology</dd></div>
+          <div><dt>Stack</dt><dd>TensorFlow · TenSEAL (CKKS) · SHAP · Streamlit</dd></div>
+          <div><dt>Links</dt><dd><a href="https://huggingface.co/spaces/Boovesh985/secure-ecg-analysis" target="_blank" rel="noopener">Try the live demo ↗</a><br /><a href="https://github.com/Boovesh985/privacy-preserving-ecg-diagnosis" target="_blank" rel="noopener">Source ↗</a></dd></div>
+        </dl>
+      </section>
+
+      <section class="cs-cover" data-shape="3" data-theme="dark">
+        <figure class="shot js-shot"><div class="shot__frame shot__frame--paper cs-cover__frame"><img src="/img/ecg-training.webp" alt="Training curves reaching 95.9% validation accuracy" loading="lazy" /></div></figure>
+      </section>
+
+      <section class="cs-overview" data-theme="dark">
+        <div class="cs-overview__col">
+          <p class="eyebrow mono js-decode">The problem</p>
+          <p class="cs-lead js-fade">Cloud ECG analysis means sending a patient's raw cardiac signal to someone else's server. Encrypting it in transit isn't enough when the server has to decrypt it to run the model.</p>
+        </div>
+        <div class="cs-overview__col">
+          <p class="eyebrow mono js-decode">What I built</p>
+          <p class="cs-body js-fade">A pipeline where the patient device encrypts each 187-sample heartbeat with CKKS, the server runs a 1D-CNN directly on the ciphertext, and only the device can decrypt the result. SHAP then attributes the prediction to 45 clinical ECG features a clinician can read.</p>
+        </div>
+      </section>
+
+      <section class="cs-flow" data-theme="light">
+        <p class="eyebrow mono js-decode">Sequence</p>
+        <h2 class="cs-h2 js-lines">The encrypted pipeline</h2>
+        <ol class="cs-flow__list">
+          <li class="cs-step js-step"><span class="cs-step__n">01</span><h3 class="cs-step__title">Encrypt on the device</h3><p class="cs-step__text">CKKS at 128-bit security (polynomial modulus 8192), about 340 KB of ciphertext per beat.</p></li>
+          <li class="cs-step js-step"><span class="cs-step__n">02</span><h3 class="cs-step__title">Infer on ciphertext</h3><p class="cs-step__text">The CNN's convolutions are fused into matrix multiplications the server runs without decrypting.</p></li>
+          <li class="cs-step js-step"><span class="cs-step__n">03</span><h3 class="cs-step__title">Decrypt on the device</h3><p class="cs-step__text">Logits become softmax probabilities across five AAMI classes: N, S, V, F and Q.</p></li>
+          <li class="cs-step js-step"><span class="cs-step__n">04</span><h3 class="cs-step__title">Explain the result</h3><p class="cs-step__text">SHAP ranks P-wave, QRS, ST-segment, RR-interval, statistical and wavelet features.</p></li>
+        </ol>
+      </section>
+
+      <section class="cs-figures" data-theme="light">
+        <div class="cs-figure js-figure"><span class="cs-figure__n">95.66%</span><span class="cs-figure__l mono">accuracy on MIT-BIH</span></div>
+        <div class="cs-figure js-figure"><span class="cs-figure__n">~420 ms</span><span class="cs-figure__l mono">encrypt → infer → decrypt</span></div>
+        <div class="cs-figure js-figure"><span class="cs-figure__n">128-bit</span><span class="cs-figure__l mono">CKKS security</span></div>
+        <div class="cs-figure js-figure"><span class="cs-figure__n">45</span><span class="cs-figure__l mono">clinical features explained</span></div>
+      </section>
+
+      <section class="cs-decisions" data-theme="dark">
+        <p class="eyebrow mono js-decode">What the research adds</p>
+        <div class="cs-decisions__grid">
+          <article class="cs-decision js-fade"><h3>Risk-adaptive encryption</h3><p>Encryption strength follows clinical risk: 80-bit for normal beats, up to 192-bit for life-critical ventricular arrhythmias.</p></article>
+          <article class="cs-decision js-fade"><h3>Explanations under noise</h3><p>SHAP rankings stay stable (ρ &gt; 0.96) down to 5 dB SNR, the kind of noise wearable ECGs produce.</p></article>
+          <article class="cs-decision js-fade"><h3>Cross-dataset checks</h3><p>Trained on MIT-BIH, tested on PTB-XL, measuring how explanations and encrypted accuracy hold up under domain shift. Extends Cenitta et al., IEEE Access 2025.</p></article>
+        </div>
+      </section>
+
+      <section class="cs-gallery" data-theme="dark">
+        <figure class="shot js-shot cs-gallery__wide"><div class="shot__frame shot__frame--paper shot__frame--auto"><img src="/img/ecg-confusion.webp" alt="Confusion matrix across five arrhythmia classes" loading="lazy" /></div><figcaption class="mono">Confusion matrix, five classes</figcaption></figure>
+        <figure class="shot js-shot cs-gallery__wide"><div class="shot__frame shot__frame--paper shot__frame--auto"><img src="/img/ecg-dataset.webp" alt="MIT-BIH class distribution and example beats" loading="lazy" /></div><figcaption class="mono">Dataset overview: class balance across MIT-BIH</figcaption></figure>
+      </section>
+
+      <section class="cs-stack" data-theme="dark">
+        <p class="eyebrow mono js-decode">Built with</p>
+        <dl class="spec__table cs-stack__table mono js-stagger">
+          <div><dt>Deep learning</dt><dd>TensorFlow / Keras 1D-CNN</dd></div>
+          <div><dt>Encryption</dt><dd>TenSEAL (Microsoft SEAL), CKKS</dd></div>
+          <div><dt>Explainability</dt><dd>SHAP DeepExplainer and KernelExplainer</dd></div>
+          <div><dt>Data</dt><dd>MIT-BIH Arrhythmia, PTB-XL</dd></div>
+          <div><dt>Demo</dt><dd>Streamlit on Hugging Face Spaces</dd></div>
+          <div><dt>Tools</dt><dd>NumPy, scikit-learn, Matplotlib</dd></div>
+        </dl>
+        <div class="spec__links">
+          <a class="btn " href="https://huggingface.co/spaces/Boovesh985/secure-ecg-analysis" target="_blank" rel="noopener" data-magnetic>Try the live demo <span>↗</span></a>
+          <a class="btn btn--ghost" href="https://github.com/Boovesh985/privacy-preserving-ecg-diagnosis" target="_blank" rel="noopener" data-magnetic>Source <span>↗</span></a>
+        </div>
+      </section>
+
+      <section class="cs-next" data-shape="1" data-theme="dark">
+        <a href="/projects/steel-commerce/" data-transition="Steel E-Commerce" class="cs-next__link" data-cursor="Next">
+          <span class="eyebrow mono">Next project</span>
+          <span class="cs-next__title">Steel<br />E-Commerce</span>
+          <span class="cs-next__label mono">Full-stack · Web + Android</span>
+        </a>
+        <footer class="footer mono">
+          <span>© 2026 Booveshwaran T</span>
+          <a href="/" data-transition="Home" class="js-hover-scramble">Home</a>
+          <a href="#top" class="js-hover-scramble">Back to top ↑</a>
+        </footer>
+      </section>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
