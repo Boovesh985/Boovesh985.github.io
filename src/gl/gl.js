@@ -40,7 +40,12 @@ export class GL {
 
     window.addEventListener('resize', () => this.resize())
     window.addEventListener('pointermove', (e) => this.#onPointer(e), { passive: true })
-    window.addEventListener('pointerdown', (e) => this.#onPointer(e), { passive: true })
+    window.addEventListener('pointerdown', (e) => {
+      this.#onPointer(e)
+      if (e.pointerType === 'mouse' && e.button === 0 && !e.target.closest('a, button')) this.setAttract(true)
+    }, { passive: true })
+    window.addEventListener('pointerup', () => this.setAttract(false))
+    window.addEventListener('blur', () => this.setAttract(false))
     document.addEventListener('pointerleave', () => { this.pointer.active = 0 })
 
     this.start = performance.now()
@@ -49,7 +54,8 @@ export class GL {
   }
 
   #buildParticles() {
-    const n = this.isMobile ? 14000 : 26000
+    const n = this.isMobile ? 12000 : 24000
+    this.count = n
     const g = new BufferGeometry()
     const shapes = [sphere(n), pipes(n), network(n), heart(n), spiral(n)]
     g.setAttribute('position', new BufferAttribute(shapes[0], 3))
@@ -75,6 +81,8 @@ export class GL {
         uTheme: { value: 0 },
         uOpacity: { value: 1 },
         uMouseStrength: { value: 0 },
+        uBurst: { value: 0 },
+        uAttract: { value: 0 },
         uW: { value: this.weights },
         uMouse: { value: this.mouseWorld },
         uInk: { value: hex('#0e1114') },
@@ -148,17 +156,19 @@ export class GL {
     this.trailMat.uniforms.uAspect.value = w / h
     // Keep shapes a sensible size on portrait screens
     this.baseScale = Math.min(1, (w / h) * 0.95 + 0.25)
-    this.setShape(this.shape, true)
+    // Re-target the layout for the new size without resetting a morph in progress
+    const L = this.#layout(this.shape)
+    this.target.x = L.x; this.target.y = L.y; this.target.scale = L.s * this.baseScale
   }
 
   // Where each shape sits on screen (desktop / mobile)
   #layout(i) {
     const m = this.isMobile
     const L = [
-      { x: m ? 0 : 0.35, y: m ? 0.45 : 0.28, s: m ? 0.85 : 0.82 },
-      { x: m ? 0 : 1.55, y: m ? 0.9 : 0, s: m ? 0.62 : 0.8 },
-      { x: m ? 0 : 1.35, y: m ? 0.9 : 0, s: m ? 0.55 : 0.75 },
-      { x: m ? 0 : 1.6, y: m ? 0.9 : 0, s: m ? 0.62 : 0.85 },
+      { x: m ? 0 : 0.35, y: m ? 0.15 : 0.28, s: m ? 0.7 : 0.82 },
+      { x: m ? 0 : 1.55, y: m ? 1.0 : 0, s: m ? 0.62 : 0.8 },
+      { x: m ? 0 : 1.35, y: m ? 1.0 : 0, s: m ? 0.55 : 0.75 },
+      { x: m ? 0 : 1.6, y: m ? 0.95 : 0, s: m ? 0.62 : 0.85 },
       { x: m ? 0 : 1.2, y: 0, s: m ? 0.7 : 0.9 },
     ]
     // Case-study pages have a wider title column, so shapes sit further right and smaller.
@@ -185,6 +195,41 @@ export class GL {
     gsap.to(this.pMat.uniforms.uTheme, { value: dark ? 1 : 0, duration: 0.9, ease: 'power2.out' })
   }
 
+  // Particles fling outward and settle back (hovering projects, page transitions)
+  burst(amount = 0.45) {
+    if (this.reduced) return
+    const u = this.pMat.uniforms.uBurst
+    gsap.timeline({ overwrite: true })
+      .to(u, { value: amount, duration: 0.35, ease: 'power2.out' })
+      .to(u, { value: 0, duration: 1.6, ease: 'power3.inOut' })
+  }
+
+  setAttract(on) {
+    if (this.reduced) return
+    gsap.to(this.pMat.uniforms.uAttract, { value: on ? 1 : 0, duration: on ? 0.9 : 1.4, ease: on ? 'power2.out' : 'elastic.out(1, 0.6)', overwrite: true })
+  }
+
+  // Lower resolution, then particle count, if frames run long; never raise it back mid-session.
+  #adapt(dt) {
+    if (document.hidden || dt > 250) return
+    this.frames = (this.frames || 0) + 1
+    this.acc = (this.acc || 0) + dt
+    if (this.frames < 90) return
+    const avg = this.acc / this.frames
+    this.frames = 0; this.acc = 0
+    if (performance.now() - this.start < 4000 || avg < 21) return
+    if (this.dpr > 1) {
+      this.dpr = Math.max(1, this.dpr - 0.35)
+      this.renderer.setPixelRatio(this.dpr)
+      this.pMat.uniforms.uPixelRatio.value = this.dpr
+      this.resize()
+    } else if (!this.reducedCount) {
+      this.reducedCount = true
+      this.points.geometry.setDrawRange(0, Math.floor(this.count * 0.6))
+      this.pMat.uniforms.uSize.value *= 1.15
+    }
+  }
+
   setOpacity(v, d = 0.8) {
     gsap.to(this.pMat.uniforms.uOpacity, { value: v, duration: d, ease: 'power2.out' })
   }
@@ -195,6 +240,7 @@ export class GL {
 
   render() {
     const now = performance.now()
+    this.#adapt(now - this.last)
     this.last = now
     const t = (now - this.start) / 1000
     const u = this.pMat.uniforms

@@ -161,8 +161,8 @@ export function heart(n) {
   }
   for (; i < n; i++) {
     const t = Math.random()
-    const x = (t - 0.5) * 6.2
-    const y = -1.55 + ecg(t * 3.2 + 0.1) * 0.9
+    const x = (t - 0.5) * 3.6
+    const y = -1.55 + ecg(t * 2 + 0.1) * 0.9
     a[i * 3] = x + (Math.random() - 0.5) * 0.01
     a[i * 3 + 1] = y + (Math.random() - 0.5) * 0.02
     a[i * 3 + 2] = 0.4 + (Math.random() - 0.5) * 0.04

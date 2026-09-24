@@ -56,11 +56,11 @@ export function initDecrypt(root, gl) {
       const dx = p.x - last.x, dy = p.y - last.y
       const d = Math.hypot(dx, dy)
       const step = fs * 0.1
-      const n = Math.min(Math.floor(d / step), 12)
+      const n = Math.min(Math.floor(d / step), 6)
       for (let i = 1; i <= n; i++) pts.push({ x: last.x + (dx * i) / (n + 1), y: last.y + (dy * i) / (n + 1), life: 1 })
     }
     pts.push({ ...p, life: 1 })
-    while (pts.length > 60) pts.shift()
+    while (pts.length > 32) pts.shift()
     last = p
   }
 

@@ -1,16 +1,26 @@
 // Renders one static case-study page per project into /projects/<slug>/index.html.
 // Run automatically before `vite build` and `vite dev` (see package.json).
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { projects } from '../src/data/projects.js'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+
+// Width/height of a WebP so every <img> reserves its space before it loads (no layout shift).
+function webpSize(src) {
+  const b = readFileSync(resolve(root, 'public', src.replace(/^\//, '')))
+  const chunk = b.toString('ascii', 12, 16)
+  if (chunk === 'VP8X') return [1 + b.readUIntLE(24, 3), 1 + b.readUIntLE(27, 3)]
+  if (chunk === 'VP8L') { const n = b.readUInt32LE(21); return [1 + (n & 0x3fff), 1 + ((n >> 14) & 0x3fff)] }
+  return [b.readUInt16LE(26) & 0x3fff, b.readUInt16LE(28) & 0x3fff]
+}
+const dims = (src) => { const [w, h] = webpSize(src); return `width="${w}" height="${h}"` }
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 
 const frame = (img, extra = '') => {
   const cls = ['shot__frame', img.square && 'shot__frame--square', img.paper && 'shot__frame--paper', extra].filter(Boolean).join(' ')
-  return `<div class="${cls}"><img src="${img.src}" alt="${esc(img.alt)}" loading="lazy" /></div>`
+  return `<div class="${cls}"><img src="${img.src}" ${dims(img.src)} alt="${esc(img.alt)}" loading="lazy" decoding="async" /></div>`
 }
 
 function page(p, i) {
@@ -31,7 +41,8 @@ function page(p, i) {
     <script>try{if(sessionStorage.getItem('bt-transition'))document.documentElement.classList.add('is-arriving')}catch(e){}</script>
   </head>
   <body data-page="project" data-shape="${p.shape}">
-    <div class="curtain" aria-hidden="true"><span class="curtain__label mono"></span><div class="curtain__bar"><i></i></div></div>
+    <div class="curtain" aria-hidden="true"><div class="curtain__inner"><span class="curtain__eyebrow mono">Opening</span><span class="curtain__label"></span></div></div>
+    <div class="wipe" aria-hidden="true"></div>
     <canvas class="gl" aria-hidden="true"></canvas>
     <div class="cursor" aria-hidden="true"><div class="cursor__ring"><span class="cursor__label"></span></div><div class="cursor__dot"></div></div>
 
@@ -41,9 +52,9 @@ function page(p, i) {
         <span class="nav__name mono js-hover-scramble">Booveshwaran T</span>
       </a>
       <nav class="nav__links mono" aria-label="Primary">
-        <a href="/#work" data-transition="Selected work" class="js-hover-scramble">Work</a>
-        <a href="/#about" data-transition="About" class="js-hover-scramble">About</a>
-        <a href="/#contact" data-transition="Contact" class="js-hover-scramble">Contact</a>
+        <a href="/#work" data-transition="Selected work" class="js-roll">Work</a>
+        <a href="/#about" data-transition="About" class="js-roll">About</a>
+        <a href="/#contact" data-transition="Contact" class="js-roll">Contact</a>
       </nav>
       <div class="nav__time mono"><span class="dot"></span><span class="js-clock">--:--</span> IST</div>
     </header>
@@ -61,13 +72,14 @@ function page(p, i) {
         <dl class="cs-meta mono js-hero-fade">
           <div><dt>Year</dt><dd>${esc(p.year)}</dd></div>
           <div><dt>Discipline</dt><dd>${esc(p.label)}</dd></div>
-          <div><dt>Stack</dt><dd>${esc(p.stackShort)}</dd></div>
+          <div><dt>Stack</dt><dd>${esc(p.stackShort)}</dd></div>${p.team ? `
+          <div><dt>Team</dt><dd>${esc(p.team)}</dd></div>` : ''}
           <div><dt>Links</dt><dd>${p.links.map((l) => `<a href="${l.href}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join('<br />')}</dd></div>
         </dl>
       </section>
 
       <section class="cs-cover" data-shape="${p.shape}" data-theme="dark">
-        <figure class="shot js-shot">${frame(p.cover, 'cs-cover__frame')}</figure>
+        <figure class="shot js-cover">${frame(p.cover, 'cs-cover__frame')}</figure>
       </section>
 
       <section class="cs-overview" data-theme="dark">
@@ -101,7 +113,13 @@ function page(p, i) {
       </section>
 ${p.gallery.length ? `
       <section class="cs-gallery" data-theme="dark">
-        ${p.gallery.map((g) => `<figure class="shot js-shot ${g.wide ? 'cs-gallery__wide' : ''}">${frame(g, 'shot__frame--auto')}<figcaption class="mono">${esc(g.caption)}</figcaption></figure>`).join('\n        ')}
+        <div class="cs-gallery__head">
+          <p class="eyebrow mono js-decode">Gallery</p>
+          <p class="cs-gallery__count mono"><span class="js-gcount">01</span> / ${String(p.gallery.length).padStart(2, '0')}</p>
+        </div>
+        <div class="cs-gallery__track">
+          ${p.gallery.map((g) => `<figure class="hfig">${frame(g)}<figcaption class="mono">${esc(g.caption)}</figcaption></figure>`).join('\n          ')}
+        </div>
       </section>` : ''}
 
       <section class="cs-stack" data-theme="dark">
@@ -110,20 +128,20 @@ ${p.gallery.length ? `
           ${p.stack.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('\n          ')}
         </dl>
         <div class="spec__links">
-          ${p.links.map((l, k) => `<a class="btn ${k ? 'btn--ghost' : ''}" href="${l.href}" target="_blank" rel="noopener" data-magnetic>${esc(l.label)} <span>↗</span></a>`).join('\n          ')}
+          ${p.links.map((l, k) => `<a class="btn ${k ? 'btn--ghost' : ''}" href="${l.href}" target="_blank" rel="noopener" data-magnetic><span class="js-roll">${esc(l.label)}</span> <span>↗</span></a>`).join('\n          ')}
         </div>
       </section>
 
       <section class="cs-next" data-shape="${next.shape}" data-theme="dark">
-        <a href="/projects/${next.slug}/" data-transition="${esc(next.title.join(' '))}" class="cs-next__link" data-cursor="Next">
+        <a href="/projects/${next.slug}/" data-transition="${esc(next.title.join(' '))}" class="cs-next__link" data-cursor="Next" data-burst>
           <span class="eyebrow mono">Next project</span>
           <span class="cs-next__title">${next.title.map(esc).join('<br />')}</span>
           <span class="cs-next__label mono">${esc(next.label)}</span>
         </a>
         <footer class="footer mono">
           <span>© 2026 Booveshwaran T</span>
-          <a href="/" data-transition="Home" class="js-hover-scramble">Home</a>
-          <a href="#top" class="js-hover-scramble">Back to top ↑</a>
+          <a href="/" data-transition="Home" class="js-roll">Home</a>
+          <a href="#top" class="js-roll">Back to top ↑</a>
         </footer>
       </section>
     </main>

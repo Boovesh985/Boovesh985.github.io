@@ -54,6 +54,8 @@ uniform float uTurb;
 uniform float uTheme;
 uniform float uOpacity;
 uniform float uMouseStrength;
+uniform float uBurst;
+uniform float uAttract;
 uniform float uW[5];
 uniform vec3 uMouse;
 uniform vec3 uInk;
@@ -96,6 +98,9 @@ void main(){
   );
   p += n * (0.016 + chaos * 0.85 + uTurb * 0.12) * (0.6 + aRand.z * 0.8);
 
+  // burst: fling outward along the particle's direction, then settle back
+  p += normalize(p + vec3(0.0001)) * uBurst * (0.35 + aRand.x * 1.1) + n * uBurst * 0.5;
+
   // intro: particles bloom out from the centre
   float k = clamp(uIntro * 1.7 - aRand.x * 0.7, 0.0, 1.0);
   k = 1.0 - pow(1.0 - k, 3.0);
@@ -106,8 +111,14 @@ void main(){
   // cursor repulsion (world space, on the z = 0 plane)
   vec3 d = wp.xyz - uMouse;
   float dist = length(d.xy);
-  float f = (1.0 - smoothstep(0.0, 1.05, dist)) * uMouseStrength;
+  float f = (1.0 - smoothstep(0.0, 1.05, dist)) * uMouseStrength * (1.0 - uAttract);
   wp.xyz += normalize(d + vec3(0.0, 0.0, 0.001)) * f * 0.5;
+
+  // hold to attract: particles spiral into the cursor
+  vec2 to = uMouse.xy - wp.xy;
+  float fa = exp(-dot(to, to) * 0.28) * uAttract;
+  wp.xy += to * fa * 0.82 + vec2(-to.y, to.x) * fa * 0.55;
+  wp.z += fa * (aRand.y - 0.5) * 1.4;
 
   vec4 mv = viewMatrix * wp;
   gl_Position = projectionMatrix * mv;
@@ -117,7 +128,7 @@ void main(){
   vec3 base = mix(uInk, uSteel, uTheme);
   float tinted = step(0.7, aRand.z);
   vec3 tint = temper(aRand.y + p.x * 0.08);
-  vColor = mix(base, tint, clamp(tinted + f * 1.5 + chaos * 0.5, 0.0, 1.0));
+  vColor = mix(base, tint, clamp(tinted + f * 1.5 + chaos * 0.5 + fa * 1.2 + uBurst * 0.6, 0.0, 1.0));
   float depth = smoothstep(-2.6, 2.2, wp.z);
   vAlpha = k * uOpacity * (0.25 + 0.55 * aRand.w) * (0.35 + 0.65 * depth);
 }
