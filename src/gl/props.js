@@ -187,7 +187,6 @@ function astro(prop) {
       // says hi as soon as it appears, then every few seconds, and whenever you hover
       const c = t % 6
       const wave = Math.max(s.hover, smooth(clamp(c / 0.5, 0, 1)) * smooth(clamp((3.2 - c) / 0.5, 0, 1)))
-      prop.el.classList.toggle('is-waving', wave > 0.6)
       const f = flip.t, fk = Math.sin(Math.PI * f)
       A.apply([[POSES.idle, 1 - wave], [POSES.wave, wave], [POSES.tuck, fk * 1.5]], (P) => {
         P.neck[1] += s.mx * 0.6 * (1 - fk) * (1 - wave * 0.6); P.neck[0] -= s.my * 0.3 * (1 - fk)
