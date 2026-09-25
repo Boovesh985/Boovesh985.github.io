@@ -44,11 +44,12 @@ export const POSES = {
     hipL: [0.05, 0, 0.38], hipR: [0.05, 0, -0.38], knL: [0.7, 0, 0], knR: [0.7, 0, 0],
     lift: 0,
   },
+  // hello: right upper arm out to the side, forearm straight up, palm to the viewer
   wave: {
-    spine: [-0.05, 0, 0], neck: [0.05, 0, 0],
-    shL: [-0.2, 0, 0.8], shR: [-0.3, 0, -2.55], elL: [-0.6, 0, 0], elR: [-0.55, 0, 0],
+    spine: [-0.04, 0, 0.06], neck: [0.06, 0, -0.14],
+    shL: [0.05, 0, 0.32], shR: [-0.12, 0, -1.3], elL: [-0.45, 0, 0], elR: [-0.1, 0, -1.78],
     hipL: [-0.1, 0, 0.15], hipR: [0.05, 0, -0.15], knL: [0.4, 0, 0], knR: [0.2, 0, 0],
-    lift: 0,
+    lift: 0, palm: 1,
   },
 }
 
@@ -219,7 +220,7 @@ export function createAstronaut({ env }) {
     el.add(mesh(folded(0.12, 0.2, { folds: 3, amp: 0.012, from: 0, to: 0.7, seed: s * 5 }), fabric, 0, -0.2, 0))
     el.add(ring(0.128, 0.035, metal, -0.38), ring(0.132, 0.014, anodized, -0.35)) // wrist disconnect
     // glove: gauntlet, palm, fingers and thumb
-    const hand = new Group(); hand.position.y = -0.42; el.add(hand)
+    const hand = new Group(); hand.position.y = -0.42; el.add(hand); J['hand' + k] = hand
     hand.add(mesh(new CylinderGeometry(0.1, 0.12, 0.1, 24), glove, 0, -0.03, 0))
     const palm = mesh(new RoundedBoxGeometry(0.12, 0.2, 0.21, 3, 0.05), glove, 0, -0.15, 0.01)
     hand.add(palm)
@@ -265,16 +266,19 @@ export function createAstronaut({ env }) {
   function apply(mix, extra = null) {
     JOINTS.forEach((j) => { pose[j][0] = pose[j][1] = pose[j][2] = 0 })
     pose.lift = 0
+    pose.palm = 0
     let total = 0
     for (const [, w] of mix) total += w
     for (const [p, w] of mix) {
       const k = w / (total || 1)
       JOINTS.forEach((j) => { pose[j][0] += p[j][0] * k; pose[j][1] += p[j][1] * k; pose[j][2] += p[j][2] * k })
       pose.lift += p.lift * k
+      pose.palm += (p.palm || 0) * k
     }
     if (extra) extra(pose)
     JOINTS.forEach((j) => J[j].rotation.set(pose[j][0], pose[j][1], pose[j][2]))
     body.position.y = pose.lift
+    J.handR.rotation.y = -Math.PI / 2 * pose.palm // turn the right palm to face forward
   }
 
   return { root, body, joints: J, apply, visor }

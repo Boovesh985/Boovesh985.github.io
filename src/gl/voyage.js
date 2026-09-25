@@ -643,7 +643,7 @@ export class Voyage {
       P.shL[2] += Math.sin(t * 1.1) * 0.08; P.shR[2] -= Math.sin(t * 1.1 + 0.8) * 0.08
       P.hipL[0] += Math.sin(t * 1.3) * 0.1; P.hipR[0] -= Math.sin(t * 1.3) * 0.1
       if (p >= 0.3) { P.knL[0] += Math.max(0, Math.sin(t * 2.2)) * 0.25; P.knR[0] += Math.max(0, -Math.sin(t * 2.2)) * 0.25 }
-      if (waving) P.shR[2] += Math.sin(t * 7) * 0.28 * waving
+      if (waving) { P.elR[2] += Math.sin(t * 8) * 0.38 * waving; P.shR[2] += Math.sin(t * 8 + 0.6) * 0.06 * waving }
     })
     root.position.copy(pos)
     root.rotation.set(rx, ry, rz, 'YXZ')

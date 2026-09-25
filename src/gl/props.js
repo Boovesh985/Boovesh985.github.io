@@ -184,19 +184,22 @@ function astro(prop) {
       tween = gsap.to(flip, { t: 1, duration: 1.2, ease: 'power2.inOut' })
     },
     update(t, dt, s) {
-      const waveCycle = (t % 7) / 7
-      const wave = Math.max(s.hover, smooth(clamp((waveCycle - 0.55) * 6, 0, 1)) * smooth(clamp((0.98 - waveCycle) * 6, 0, 1)))
+      // says hi as soon as it appears, then every few seconds, and whenever you hover
+      const c = t % 6
+      const wave = Math.max(s.hover, smooth(clamp(c / 0.5, 0, 1)) * smooth(clamp((3.2 - c) / 0.5, 0, 1)))
+      prop.el.classList.toggle('is-waving', wave > 0.6)
       const f = flip.t, fk = Math.sin(Math.PI * f)
       A.apply([[POSES.idle, 1 - wave], [POSES.wave, wave], [POSES.tuck, fk * 1.5]], (P) => {
-        P.neck[1] += s.mx * 0.6 * (1 - fk); P.neck[0] -= s.my * 0.3 * (1 - fk)
+        P.neck[1] += s.mx * 0.6 * (1 - fk) * (1 - wave * 0.6); P.neck[0] -= s.my * 0.3 * (1 - fk)
         P.spine[1] += s.mx * 0.15
         P.shL[2] += Math.sin(t * 1.1) * 0.08
         P.hipL[0] += Math.sin(t * 1.3) * 0.1; P.hipR[0] -= Math.sin(t * 1.3) * 0.1
-        if (wave > 0.01) P.shR[2] += Math.sin(t * 7) * 0.3 * wave
+        if (wave > 0.01) { P.elR[2] += Math.sin(t * 8) * 0.38 * wave; P.shR[2] += Math.sin(t * 8 + 0.6) * 0.06 * wave }
       })
       A.body.rotation.x = f > 0 && f < 1 ? -TAU * (f < 0.5 ? 4 * f * f * f : 1 - Math.pow(-2 * f + 2, 3) / 2) : 0
       A.root.position.y = -0.2 + Math.sin(t * 0.9) * 0.08 + fk * 0.5
-      A.root.rotation.set(s.my * -0.1, s.mx * 0.45 + Math.sin(t * 0.3) * 0.12, Math.sin(t * 0.5) * 0.06, 'YXZ')
+      // faces you while saying hi, otherwise turns a little toward the cursor
+      A.root.rotation.set(s.my * -0.1, (s.mx * 0.4 + Math.sin(t * 0.3) * 0.12) * (1 - wave * 0.8), Math.sin(t * 0.5) * 0.06, 'YXZ')
       const a = t * 0.8
       orb.position.set(Math.cos(a) * 1.25, 0.6 + Math.sin(a * 1.3) * 0.25, Math.sin(a) * 1.25)
     },
