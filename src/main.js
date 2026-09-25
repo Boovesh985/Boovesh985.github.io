@@ -331,6 +331,89 @@ function heroParallax() {
   gsap.to($('.hero__bottom'), { opacity: 0, ease: 'none', scrollTrigger: { ...st, end: '25% top' } })
 }
 
+/* ---------- Voyage: the astronaut's dive through the stack ---------- */
+async function voyage() {
+  const sec = $('.voyage')
+  if (!sec) return
+  const canvas = $('.voyage__gl', sec)
+  const stage = $('.voyage__stage', sec)
+  const capA = $('.voyage__cap--a', sec)
+  const capEnd = $('.voyage__cap--end', sec)
+  const hint = $('.voyage__hint', sec)
+  const panel = $('.voyage__layer', sec)
+  const rail = $('.voyage__rail', sec)
+  const items = $$('li', rail)
+  const num = $('.js-vl-n', sec)
+  const name = $('.js-vl-name', sec)
+  const tools = $('.js-vl-tools', sec)
+  name.innerHTML = `<span>${name.textContent}</span>`
+  const nameInner = name.firstChild
+
+  let V, LAYERS
+  try {
+    const mod = await import('./gl/voyage.js')
+    LAYERS = mod.LAYERS
+    V = new mod.Voyage(canvas, { isMobile: innerWidth <= 900, onLayer: (i) => setLayer(i) })
+  } catch (err) {
+    console.warn('Voyage unavailable.', err)
+    sec.classList.add('is-static')
+    ScrollTrigger.refresh()
+    return
+  }
+
+  let shown = -1
+  function setLayer(i) {
+    items.forEach((li, k) => { li.classList.toggle('is-active', k === i); li.classList.toggle('is-past', k < i) })
+    if (i < 0 || i === shown) return
+    shown = i
+    sec.style.setProperty('--layer', LAYERS[i].color)
+    num.textContent = String(i + 1).padStart(2, '0')
+    gsap.timeline({ overwrite: true })
+      .to(nameInner, { yPercent: -110, duration: 0.28, ease: 'power2.in' })
+      .add(() => { nameInner.textContent = items[i].textContent })
+      .fromTo(nameInner, { yPercent: 110 }, { yPercent: 0, duration: 0.7, ease: 'expo.out' })
+    tools.dataset.text = items[i].dataset.tools
+    scramble(tools, { duration: 0.6 })
+  }
+
+  window.addEventListener('resize', () => V.resize())
+  if (import.meta.env.DEV) window.__voyage = V
+
+  if (reduced) {
+    sec.classList.add('is-static')
+    ScrollTrigger.refresh()
+    V.enter = 1; V.progress = V.p = 0.02; V.visible = true
+    V.resize(); V.render(); V.visible = false
+    return
+  }
+
+  stage.addEventListener('click', () => V.doFlip())
+  const on = (el, v) => el.classList.toggle('is-on', v)
+
+  ScrollTrigger.create({ trigger: sec, start: 'top bottom', end: 'bottom top', onToggle: (self) => { V.visible = self.isActive } })
+  ScrollTrigger.create({ trigger: sec, start: 'top bottom', end: 'top top', onUpdate: (self) => { V.enter = self.progress }, onLeave: () => { V.enter = 1 } })
+  // While the stage fills the screen the particle field is hidden, so it stops rendering.
+  ScrollTrigger.create({
+    trigger: sec, start: 'top top', end: 'bottom bottom',
+    onUpdate: (self) => { V.progress = self.progress },
+    onToggle: (self) => { if (gl) gl.paused = self.isActive },
+  })
+
+  gsap.ticker.add(() => {
+    if (!V.visible) return
+    V.render()
+    const p = V.p
+    on(capA, p > 0.012 && p < 0.1)
+    on(hint, V.enter > 0.7 && p < 0.07)
+    on(panel, V.layer >= 0)
+    on(rail, V.layer >= 0)
+    stage.classList.toggle('has-layer', V.layer >= 0 || (p > 0.012 && p < 0.1))
+    on(capEnd, p > 0.975)
+    // soften the stage's top edge while it scrolls into view
+    canvas.style.setProperty('--fade', (1 - V.enter).toFixed(3))
+  })
+}
+
 /* ---------- Home: marquee, archive preview, email ---------- */
 function marquee() {
   $$('.marquee__row').forEach((row) => {
@@ -484,6 +567,7 @@ bursts()
 document.fonts.ready.then(() => {
   reveals()
   caseStudy()
+  voyage()
   ScrollTrigger.refresh()
 })
 

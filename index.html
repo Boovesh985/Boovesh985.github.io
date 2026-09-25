@@ -126,6 +126,28 @@
         </div>
       </section>
 
+      <!-- VOYAGE: a scroll-driven dive through the stack -->
+      <section class="voyage" id="voyage" data-theme="dark" aria-labelledby="voyage-title">
+        <div class="voyage__stage" data-cursor="Flip">
+          <canvas class="voyage__gl" aria-hidden="true"></canvas>
+          <h2 class="voyage__cap voyage__cap--a" id="voyage-title">Most of what I build<br />lives below the interface.</h2>
+          <p class="voyage__hint mono">Scroll to dive · click to flip</p>
+          <div class="voyage__layer" aria-hidden="true">
+            <span class="voyage__layer-k mono">Layer <span class="js-vl-n">01</span> / 05</span>
+            <span class="voyage__layer-name js-vl-name">Interface</span>
+            <span class="voyage__layer-tools mono js-vl-tools">React · Vite · Capacitor</span>
+          </div>
+          <ol class="voyage__rail mono">
+            <li data-tools="React · Vite · Capacitor for Android">Interface</li>
+            <li data-tools="Node.js · REST APIs · JWT auth · Webhooks">Services</li>
+            <li data-tools="PostgreSQL · FAISS vector search · caching">Data</li>
+            <li data-tools="LangGraph agents · 1D-CNN · SHAP, Grad-CAM">Models</li>
+            <li data-tools="CKKS homomorphic encryption · TenSEAL">Ciphertext</li>
+          </ol>
+          <p class="voyage__cap voyage__cap--end">Five layers down.<br />One engineer, end to end.</p>
+        </div>
+      </section>
+
       <!-- WORK -->
       <section class="work" id="work">
         <div class="work__head" data-shape="0" data-theme="dark">
