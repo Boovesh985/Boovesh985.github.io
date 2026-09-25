@@ -2,6 +2,7 @@ import { BufferAttribute, BufferGeometry, Group, HalfFloatType, LinearFilter, Li
 import gsap from 'gsap'
 import { sphere, pipes, network, heart, spiral } from './shapes.js'
 import { particlesVert, particlesFrag, quadVert, trailFrag, postFrag } from './shaders.js'
+import { precompile, quietShaders } from './warm.js'
 
 const hex = (h) => {
   const n = parseInt(h.slice(1), 16)
@@ -47,6 +48,14 @@ export class GL {
     window.addEventListener('pointerup', () => this.setAttract(false))
     window.addEventListener('blur', () => this.setAttract(false))
     document.addEventListener('pointerleave', () => { this.pointer.active = 0 })
+
+    // Compile the three programs in parallel before the first frame; `ready` resolves when they're done.
+    quietShaders(this.renderer)
+    this.quad.material = this.postMat
+    const post = precompile(this.renderer, this.quadScene, this.quadCam)
+    this.quad.material = this.trailMat
+    this.ready = Promise.all([post, precompile(this.renderer, this.quadScene, this.quadCam, this.trailB), precompile(this.renderer, this.scene, this.camera, this.sceneRT)])
+      .then(() => { this.compiled = true })
 
     this.start = performance.now()
     this.last = this.start
@@ -240,7 +249,7 @@ export class GL {
 
   render() {
     const now = performance.now()
-    if (this.paused) { this.last = now; return }
+    if (this.paused || !this.compiled) { this.last = now; return }
     this.#adapt(now - this.last)
     this.last = now
     const t = (now - this.start) / 1000
