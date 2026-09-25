@@ -240,6 +240,7 @@ export class GL {
 
   render() {
     const now = performance.now()
+    if (this.paused) { this.last = now; return }
     this.#adapt(now - this.last)
     this.last = now
     const t = (now - this.start) / 1000
