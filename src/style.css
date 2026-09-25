@@ -132,15 +132,8 @@ main { position: relative; z-index: 1; }
   display: flex; align-items: center; justify-content: space-between;
   padding: 18px var(--gutter); color: #fff; mix-blend-mode: difference;
 }
-.nav, .nav-band { transition: translate 0.6s var(--ease); }
-.nav-band {
-  position: fixed; top: 0; left: 0; right: 0; height: 68px; z-index: 49; pointer-events: none; opacity: 0;
-  background: color-mix(in srgb, var(--page-bg, var(--bg)) 74%, transparent);
-  -webkit-backdrop-filter: blur(14px) saturate(1.2); backdrop-filter: blur(14px) saturate(1.2);
-  border-bottom: 1px solid var(--line); transition: opacity 0.5s var(--ease), translate 0.6s var(--ease);
-}
-html.nav-solid .nav-band { opacity: 1; }
-html.nav-hidden .nav, html.nav-hidden .nav-band { translate: 0 -110%; }
+.nav { transition: translate 0.6s var(--ease); }
+html.nav-hidden .nav { translate: 0 -110%; }
 .nav__brand { display: flex; align-items: center; gap: 14px; }
 .nav__mark { font-family: var(--display); font-weight: 900; font-size: 26px; letter-spacing: 0.02em; line-height: 1; }
 .nav__links { display: flex; gap: clamp(16px, 2.5vw, 40px); }
@@ -661,8 +654,6 @@ a:hover .roll__c, button:hover .roll__c { transform: translateY(-1.25em); }
 /* ---------- 3D props (each renders inside its own box) ---------- */
 .prop__gl { display: block; width: 100%; height: 100%; opacity: 0; transform: scale(0.94); transition: opacity 1.2s var(--ease), transform 1.4s var(--ease); }
 .prop__gl.is-ready { opacity: 1; transform: none; }
-.cap__3d { height: clamp(150px, 13vw, 210px); margin: -10px -12px 14px; }
-.cap .cap__k { margin-bottom: 18px; }
 .sec-head { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--gutter); margin-bottom: 28px; }
 .sec-head .eyebrow { margin-bottom: 0; }
 .sec-head__3d { width: min(360px, 38vw); height: min(260px, 26vw); flex: none; }
