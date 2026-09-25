@@ -1,11 +1,13 @@
 import {
   AdditiveBlending, BackSide, BoxGeometry, BufferAttribute, BufferGeometry, CanvasTexture, CircleGeometry, Color, CylinderGeometry,
   DirectionalLight, DoubleSide, Fog, Group, HalfFloatType, HemisphereLight, InstancedMesh, LinearFilter, Mesh, MeshBasicMaterial,
-  MeshStandardMaterial, NoBlending, PCFSoftShadowMap, Object3D, OrthographicCamera, PerspectiveCamera, PlaneGeometry, PMREMGenerator, PointLight, Points,
+  MeshStandardMaterial, NoBlending, PCFShadowMap, Object3D, OrthographicCamera, PerspectiveCamera, PlaneGeometry, PointLight, Points,
   Quaternion, Scene, ShaderMaterial, SphereGeometry, SRGBColorSpace, TorusGeometry, Vector3, WebGLRenderTarget, WebGLRenderer,
 } from 'three'
 import gsap from 'gsap'
 import { createAstronaut, POSES } from './astronaut.js'
+import { loadSuitTextures } from './suitTextures.js'
+import { bakeEnv, idle, precompile, quietShaders, yieldToMain } from './warm.js'
 
 /*
   The Voyage: a scroll-driven dive through the stack.
@@ -142,7 +144,7 @@ export class Voyage {
     const r = (this.renderer = new WebGLRenderer({ canvas, alpha: true, antialias: false, powerPreference: 'high-performance' }))
     r.setClearColor(0x000000, 0)
     r.shadowMap.enabled = true
-    r.shadowMap.type = PCFSoftShadowMap
+    r.shadowMap.type = PCFShadowMap
     this.dpr = Math.min(window.devicePixelRatio, isMobile ? 1.5 : 1.35)
     r.setPixelRatio(this.dpr)
 
@@ -152,15 +154,8 @@ export class Voyage {
     this.camera = new PerspectiveCamera(35, 1, 0.1, 140)
     this.scene.add(this.camera)
 
-    this.#env()
-    this.#background()
-    this.#stars()
-    this.#lights()
-    this.#astronaut()
-    this.#word()
-    this.#tunnel()
-    this.#post()
-    this.resize()
+    quietShaders(r)
+    this.ready = false
 
     window.addEventListener('pointermove', (e) => {
       this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1
@@ -172,6 +167,33 @@ export class Voyage {
   }
 
   /* ---------- Build ---------- */
+
+  // Built in small steps with the main thread handed back in between, so the loader and the page
+  // keep moving; shaders compile in parallel off the main thread before the first frame is drawn.
+  async build(onStep = () => {}) {
+    const textures = loadSuitTextures() // drawn in a worker while the rest is built
+    const steps = [() => this.#env(), () => this.#background(), () => this.#stars(), () => this.#lights(),
+      () => textures.then(() => this.#astronaut()), () => this.#word(), () => this.#tunnel(), () => { this.#post(); this.resize() }]
+    for (let i = 0; i < steps.length; i++) {
+      await steps[i]()
+      onStep((i + 1) / (steps.length + 1))
+      await yieldToMain()
+    }
+    // The rest runs in the background: the GPU driver compiles every shader on its own threads.
+    onStep(1)
+    const r = this.renderer
+    this.camera.position.set(0, 0, this.camDist)
+    this.camera.updateMatrixWorld()
+    await Promise.all([precompile(r, this.scene, this.camera, this.rt), precompile(r, this.postScene, this.postCam)])
+    await idle()
+    // One hidden frame builds the shadow pass and uploads textures before anyone scrolls here.
+    r.setRenderTarget(this.rt)
+    r.render(this.scene, this.camera)
+    r.setRenderTarget(null)
+    r.render(this.postScene, this.postCam)
+    r.clear()
+    this.ready = true
+  }
 
   // Reflections: a dark room lit by temper-coloured strips (shows up in the visor and steel).
   #env() {
@@ -187,9 +209,7 @@ export class Voyage {
     strip('#2f63c2', 1.2, 8, [7, 0, 2], [0, 0, 0], 3.5)
     strip('#6c44a8', 9, 1, [0, -6, 3], [0, 0, 0], 2.5)
     strip('#c46a34', 6, 2, [0, 2, -8], [0, 0, 0], 2)
-    const pm = new PMREMGenerator(this.renderer)
-    this.env = pm.fromScene(env, 0.03).texture
-    pm.dispose()
+    return bakeEnv(this.renderer, env, 0.03).then((tex) => { this.env = tex })
   }
 
   #background() {
@@ -481,11 +501,92 @@ export class Voyage {
     const q = new Mesh(new PlaneGeometry(2, 2), this.postMat)
     q.frustumCulled = false
     this.postScene.add(q)
+    this.guestPost = new Scene()
+    this.guestQuad = new Mesh(q.geometry, this.postMat)
+    this.guestQuad.frustumCulled = false
+    this.guestPost.add(this.guestQuad)
+  }
+
+  /* ---------- Guests: the page's small 3D props ---------- */
+
+  // The props elsewhere on the page are drawn with this renderer and copied into their own 2D canvases,
+  // so they share its compiled shaders (the contact astronaut is the same suit) instead of compiling
+  // everything again in contexts of their own. Their light rig has the same make-up as the Voyage's
+  // (1 hemisphere, 3 directional with 1 shadow, 1 point), which keeps the shader programs identical.
+  guestRig({ shadow = false } = {}) {
+    const hemi = new HemisphereLight(0xffffff, 0x3a3f46, 0.7)
+    const key = new DirectionalLight(0xfff1e0, 2.2); key.position.set(3, 5, 5)
+    const rim = new DirectionalLight(0x5b8ff0, 2.4); rim.position.set(-4, 2, -4)
+    const warm = new DirectionalLight(0xe2b04f, 1.2); warm.position.set(4, -2, -3)
+    const point = new PointLight(0xffffff, 0) // unlit placeholder for the Voyage's lamp
+    if (shadow) {
+      key.castShadow = true
+      key.shadow.mapSize.set(1024, 1024)
+      Object.assign(key.shadow.camera, { left: -2.2, right: 2.2, top: 2.2, bottom: -2.2, near: 0.5, far: 20 })
+      key.shadow.bias = -0.0004
+      key.shadow.normalBias = 0.02
+    }
+    return [hemi, key, rim, warm, point]
+  }
+
+  guestScene() {
+    const scene = new Scene()
+    scene.environment = this.env
+    scene.fog = new Fog(0x000000, 900, 1000) // present (as in the Voyage) but never reached
+    return scene
+  }
+
+  #guestTarget(g) {
+    const pw = Math.max(1, Math.min(Math.round(g.w * this.dpr), this.canvas.width))
+    const ph = Math.max(1, Math.min(Math.round(g.h * this.dpr), this.canvas.height))
+    if (!g.rt) {
+      g.rt = new WebGLRenderTarget(pw, ph, { type: HalfFloatType, samples: this.isMobile ? 0 : 4 })
+      // same shader as the Voyage's post pass (so the same program), quieter settings
+      g.post = new ShaderMaterial({
+        vertexShader: quadVert, fragmentShader: postFrag, blending: NoBlending, depthTest: false, depthWrite: false,
+        uniforms: {
+          tScene: { value: g.rt.texture }, uAberr: { value: 0.0015 }, uBlur: { value: 0 }, uFlash: { value: 0 }, uFade: { value: 0 },
+          uTime: { value: 0 }, uExposure: { value: 0.82 }, uVig: { value: 0 }, uInk: { value: new Color() },
+          uFlashCol: { value: new Color() }, uRes: { value: { x: pw, y: ph } },
+        },
+      })
+    } else if (g.rt.width !== pw || g.rt.height !== ph) {
+      g.rt.setSize(pw, ph)
+      g.post.uniforms.uRes.value = { x: pw, y: ph }
+    }
+    return [pw, ph]
+  }
+
+  compileGuest(g) {
+    this.#guestTarget(g)
+    return precompile(this.renderer, g.scene, g.camera, g.rt)
+  }
+
+  // Draw a prop and copy it into its canvas. Skipped while the Voyage itself is on screen
+  // (the two are never visible together).
+  drawGuest(g, t) {
+    if (!this.ready || this.visible || !g.w || !g.h) return
+    const [pw, ph] = this.#guestTarget(g)
+    const r = this.renderer
+    r.setRenderTarget(g.rt)
+    r.clear()
+    r.render(g.scene, g.camera)
+    r.setRenderTarget(null)
+    g.post.uniforms.uTime.value = t
+    this.guestQuad.material = g.post
+    const k = r.getPixelRatio()
+    r.setViewport(0, 0, pw / k, ph / k)
+    r.render(this.guestPost, this.postCam)
+    r.setViewport(0, 0, this.w, this.h)
+    if (g.canvas.width !== pw || g.canvas.height !== ph) { g.canvas.width = pw; g.canvas.height = ph }
+    g.ctx.clearRect(0, 0, pw, ph)
+    g.ctx.drawImage(this.canvas, 0, this.canvas.height - ph, pw, ph, 0, 0, pw, ph)
   }
 
   /* ---------- Runtime ---------- */
 
   resize() {
+    if (!this.rt) return
     const w = this.canvas.clientWidth || window.innerWidth
     const h = this.canvas.clientHeight || window.innerHeight
     this.w = w; this.h = h
@@ -539,7 +640,7 @@ export class Voyage {
     const now = performance.now()
     const dt = Math.min(now - this.last, 100)
     this.last = now
-    if (!this.visible) return
+    if (!this.visible || !this.ready) return
     this.#adapt(dt)
     const t = (now - this.start) / 1000
     const k = 1 - Math.pow(0.001, dt / 1000) // frame-rate independent damping

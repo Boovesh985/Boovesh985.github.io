@@ -66,7 +66,9 @@ navScroll()
 
 /* ---------- Transitions, cursor, magnetic ---------- */
 const transitions = initTransitions({ reduced, onLeave: () => gl?.burst(1.1) })
-initCursor()
+const cursor = initCursor()
+// Scrolling slides elements under a still pointer without any pointer event: re-check what it's over.
+lenis.on('scroll', () => cursor?.refresh())
 initMagnetic()
 
 /* ---------- Theme: a circle of the new colour sweeps in behind everything ---------- */
@@ -97,11 +99,22 @@ function sectionTriggers() {
   const themed = $$('main [data-theme]')
   const shaped = $$('main [data-shape]')
   const dimmed = $$('.about, .chapter__body, .archive, .stack, .edu, .cs-cover, .cs-overview, .cs-flow, .cs-figures, .cs-decisions, .cs-gallery, .cs-stack')
+  // Page positions are measured once per layout change, not on every scroll frame (that forced a layout each frame).
+  const box = new Map()
+  const measure = () => {
+    const y = window.scrollY
+    for (const el of new Set([...themed, ...shaped, ...dimmed])) {
+      const host = el.parentElement?.classList.contains('pin-spacer') ? el.parentElement : el
+      const r = host.getBoundingClientRect()
+      box.set(el, [r.top + y, r.bottom + y])
+    }
+  }
+  let scrollY = window.scrollY
   const at = (list, y) => {
     let hit = null
     for (const el of list) {
-      const r = el.getBoundingClientRect()
-      if (r.top <= y && r.bottom > y) hit = el // later (inner) matches win
+      const [top, bottom] = box.get(el)
+      if (top - scrollY <= y && bottom - scrollY > y) hit = el // later (inner) matches win
     }
     return hit
   }
@@ -115,8 +128,10 @@ function sectionTriggers() {
     const d = !!at(dimmed, mid)
     if (d !== dim) { dim = d; gl?.setOpacity(d ? (html.dataset.theme === 'dark' ? 0.12 : 0.16) : 1) }
   }
-  lenis.on('scroll', probe)
-  window.addEventListener('resize', probe)
+  measure()
+  lenis.on('scroll', ({ scroll }) => { scrollY = scroll; probe() })
+  ScrollTrigger.addEventListener('refresh', () => { measure(); probe() })
+  new ResizeObserver(() => { measure(); probe() }).observe(body)
   probe()
 }
 
@@ -342,7 +357,7 @@ function heroParallax() {
 }
 
 /* ---------- Voyage: the astronaut's dive through the stack ---------- */
-async function voyage() {
+async function voyage(onProgress = () => {}) {
   const sec = $('.voyage')
   if (!sec) return
   const canvas = $('.voyage__gl', sec)
@@ -364,6 +379,7 @@ async function voyage() {
     const mod = await import('./gl/voyage.js')
     LAYERS = mod.LAYERS
     V = new mod.Voyage(canvas, { isMobile: innerWidth <= 900, onLayer: (i) => setLayer(i) })
+    await V.build(onProgress)
   } catch (err) {
     console.warn('Voyage unavailable.', err)
     sec.classList.add('is-static')
@@ -394,19 +410,32 @@ async function voyage() {
     ScrollTrigger.refresh()
     V.enter = 1; V.progress = V.p = 0.02; V.visible = true
     V.resize(); V.render(); V.visible = false
-    return
+    return V
   }
 
-  stage.addEventListener('click', () => V.doFlip())
+  // The stage only answers clicks (and shows the Flip cursor) while the astronaut is on screen.
+  let live = true
+  stage.addEventListener('click', () => { if (live) V.doFlip() })
+  const setLive = (v) => {
+    if (v === live) return
+    live = v
+    if (v) stage.dataset.cursor = 'Flip'
+    else delete stage.dataset.cursor
+    cursor?.refresh()
+  }
+  setLive(false)
   const on = (el, v) => el.classList.toggle('is-on', v)
+  let fade = '', out = ''
 
-  ScrollTrigger.create({ trigger: sec, start: 'top bottom', end: 'bottom top', onToggle: (self) => { V.visible = self.isActive } })
+  ScrollTrigger.create({ trigger: sec, start: 'top bottom', end: 'bottom top', onToggle: (self) => { V.visible = self.isActive; if (!self.isActive) setLive(false) } })
   ScrollTrigger.create({ trigger: sec, start: 'top bottom', end: 'top top', onUpdate: (self) => { V.enter = self.progress }, onLeave: () => { V.enter = 1 } })
-  // While the stage fills the screen the particle field is hidden, so it stops rendering.
+  // While the stage fills the screen the particle field is hidden, so it stops rendering;
+  // it wakes up for the last stretch, where the stage fades away to reveal it.
+  const covered = (self) => { if (gl) gl.paused = self.isActive && self.progress < 0.95 }
   ScrollTrigger.create({
     trigger: sec, start: 'top top', end: 'bottom bottom',
-    onUpdate: (self) => { V.progress = self.progress },
-    onToggle: (self) => { if (gl) gl.paused = self.isActive },
+    onUpdate: (self) => { V.progress = self.progress; covered(self) },
+    onToggle: covered,
   })
 
   gsap.ticker.add(() => {
@@ -419,9 +448,15 @@ async function voyage() {
     on(rail, V.layer >= 0)
     stage.classList.toggle('has-layer', V.layer >= 0 || (p > 0.012 && p < 0.1))
     on(capEnd, p > 0.975)
+    setLive(V.enter > 0.85 && p < 0.86)
     // soften the stage's top edge while it scrolls into view
-    canvas.style.setProperty('--fade', (1 - V.enter).toFixed(3))
+    const f = (1 - V.enter).toFixed(3)
+    if (f !== fade) { fade = f; canvas.style.setProperty('--fade', f) }
+    // once it has faded to ink, the stage turns see-through, so it never slides off as a hard-edged block
+    const o = (1 - gsap.utils.clamp(0, 1, (p - 0.975) / 0.02)).toFixed(3)
+    if (o !== out) { out = o; canvas.style.opacity = o }
   })
+  return V
 }
 
 /* ---------- Home: marquee, archive preview, email ---------- */
@@ -511,7 +546,7 @@ function emailCopy() {
 }
 
 /* ---------- Loader (home, first arrival only) ---------- */
-async function runLoader(onReveal) {
+async function runLoader(onReveal, work) {
   const loader = $('.loader')
   if (!loader) { onReveal(); return }
   if (transitions.arriving || reduced) { loader.remove(); onReveal(); return }
@@ -527,10 +562,30 @@ async function runLoader(onReveal) {
     digits.style.setProperty('--fill', `${c.v}%`)
   }
   const noise = setInterval(() => { cipher.textContent = cipherString(14) }, 70)
-  const fontsReady = document.fonts.ready
-  await gsap.to(c, { v: 84, duration: 1.7, ease: 'power2.inOut', onUpdate: draw })
-  await fontsReady
-  await gsap.to(c, { v: 100, duration: 0.45, ease: 'power2.out', onUpdate: draw })
+  // The count follows the real work (fonts, shaders, the Voyage build). Between steps it keeps
+  // creeping toward the next one, and it never runs faster than a minimum pace, so it neither
+  // stalls nor jumps. A slow device still gets in after a few seconds.
+  const t0 = performance.now()
+  let last = { p: -1, at: t0 }
+  let prev = t0
+  const safety = setTimeout(() => { work.p = 1 }, 9000)
+  await new Promise((resolve) => {
+    const tick = () => {
+      const now = performance.now()
+      const dt = Math.min(now - prev, 50)
+      prev = now
+      if (work.p !== last.p) last = { p: work.p, at: now }
+      const creep = (1 - work.p) * 0.35 * (1 - Math.exp(-(now - last.at) / 900))
+      const goal = Math.min(work.p + creep, (now - t0) / 1500) * 100
+      // ease toward the goal, but never faster than ~80 per second, so it can't leap
+      c.v += Math.max(0, Math.min((goal - c.v) * 0.14, dt * 0.08))
+      if (work.p >= 1 && goal >= 100 && c.v > 99.5) c.v = 100
+      draw()
+      if (c.v === 100) { gsap.ticker.remove(tick); resolve() }
+    }
+    gsap.ticker.add(tick)
+  })
+  clearTimeout(safety)
   clearInterval(noise)
   cipher.dataset.text = 'Decrypted'
   scramble(cipher, { duration: 0.4 })
@@ -580,18 +635,34 @@ tilt()
 velocitySkew()
 bursts()
 
-document.fonts.ready.then(() => {
+// Loading work, as a 0–1 fraction the loader counts along with.
+const work = { p: 0, parts: { fonts: 0, gl: 0, voyage: 0 } }
+const weights = { fonts: 0.1, gl: 0.2, voyage: $('.voyage') ? 0.7 : 0 }
+const done = (part, f = 1) => {
+  work.parts[part] = f
+  const total = Object.values(weights).reduce((a, b) => a + b, 0)
+  work.p = Math.min(1, Object.entries(weights).reduce((a, [k, w]) => a + w * work.parts[k], 0) / total)
+}
+if (gl) gl.ready.then(() => done('gl'), () => done('gl'))
+else done('gl')
+
+const voyageReady = document.fonts.ready.then(() => {
+  done('fonts')
   reveals()
   caseStudy()
-  voyage()
-  if ($('[data-prop]')) import('./gl/props.js').then(({ mountProps }) => mountProps({ reduced })).catch((e) => console.warn(e))
   ScrollTrigger.refresh()
-})
+  return voyage((f) => done('voyage', f))
+}).catch((e) => console.warn(e)).finally(() => { done('voyage'); ScrollTrigger.refresh() })
 
 if (location.hash && $(location.hash)) lenis.scrollTo($(location.hash), { immediate: true, force: true })
 if (transitions.arriving) {
   $('.loader')?.remove()
   transitions.arrive().then(heroIntro)
-} else {
-  runLoader(heroIntro)
+} else runLoader(heroIntro, work)
+
+// The small 3D props are drawn by the Voyage's renderer, so they're built once it's ready.
+if ($('[data-prop]')) {
+  voyageReady
+    .then((host) => host && import('./gl/props.js').then(({ mountProps }) => mountProps({ reduced, host })))
+    .catch((e) => console.warn(e))
 }

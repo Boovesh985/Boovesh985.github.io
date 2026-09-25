@@ -26,13 +26,28 @@ export function initCursor() {
     setRing.x(ringPos.x); setRing.y(ringPos.y)
   })
 
-  document.addEventListener('pointerover', (e) => {
-    const labelled = e.target.closest('[data-cursor]')
-    const link = e.target.closest('a, button, [data-magnetic]')
+  const apply = (target) => {
+    if (!target) return
+    const labelled = target.closest('[data-cursor]')
+    const link = target.closest('a, button, [data-magnetic]')
     if (labelled) {
       label.textContent = labelled.dataset.cursor
       el.classList.add('is-label')
     } else el.classList.remove('is-label')
     el.classList.toggle('is-hover', !!link && !labelled)
-  })
+  }
+  document.addEventListener('pointerover', (e) => apply(e.target))
+
+  // Called while scrolling: content moves under a still pointer without firing pointerover.
+  let queued = false, moved = false
+  window.addEventListener('pointermove', () => { moved = true }, { once: true, passive: true })
+  const refresh = () => {
+    if (queued || !moved) return
+    queued = true
+    setTimeout(() => requestAnimationFrame(() => {
+      queued = false
+      apply(document.elementFromPoint(pos.x, pos.y))
+    }), 80)
+  }
+  return { refresh }
 }

@@ -1,17 +1,17 @@
 import {
-  ACESFilmicToneMapping, PCFSoftShadowMap, BackSide, CanvasTexture, Color, ConeGeometry, CylinderGeometry, DirectionalLight,
-  DoubleSide, Group, HemisphereLight, Mesh, MeshBasicMaterial,
-  MeshStandardMaterial, PerspectiveCamera, PlaneGeometry, PMREMGenerator, Scene, SphereGeometry, SRGBColorSpace, TorusGeometry,
-  Vector3, WebGLRenderer,
+  CanvasTexture, Color, ConeGeometry, CylinderGeometry, DoubleSide, Group, Mesh, MeshStandardMaterial,
+  PerspectiveCamera, PlaneGeometry, SphereGeometry, SRGBColorSpace, TorusGeometry, Vector3,
 } from 'three'
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js'
 import gsap from 'gsap'
 import { createAstronaut, POSES } from './astronaut.js'
+import { loadSuitTextures } from './suitTextures.js'
+import { idle, yieldToMain } from './warm.js'
 
 /*
   Small 3D objects that live inside page elements ([data-prop="kind"]).
   Each gets its own canvas sized to its box, so nothing can spill over the text around it,
-  and it only renders while on screen.
+  and it only renders while on screen. They're drawn by the Voyage's renderer (the host).
 */
 
 const TAU = Math.PI * 2
@@ -24,26 +24,6 @@ const mat = {
   ink: () => new MeshStandardMaterial({ color: 0x1b1f24, metalness: 0.45, roughness: 0.4 }),
   white: () => new MeshStandardMaterial({ color: 0xeef0f2, metalness: 0.02, roughness: 0.5 }),
   glow: (hex, k = 1.2) => new MeshStandardMaterial({ color: hex, emissive: hex, emissiveIntensity: k, roughness: 0.35, metalness: 0.1 }),
-}
-
-// Reflections: a dark room with temper-coloured light strips.
-function makeEnv(renderer) {
-  const env = new Scene()
-  env.add(new Mesh(new SphereGeometry(10, 24, 12), new MeshBasicMaterial({ color: 0x0b0c0f, side: BackSide })))
-  const strip = (color, w, h, pos, k) => {
-    const m = new Mesh(new PlaneGeometry(w, h), new MeshBasicMaterial({ color: new Color(color).multiplyScalar(k), side: DoubleSide }))
-    m.position.set(...pos); m.lookAt(0, 0, 0)
-    env.add(m)
-  }
-  strip('#ffffff', 9, 3, [0, 7, 3], 2.4)
-  strip('#ffffff', 5, 5, [5, 2, 6], 1.2)
-  strip(C.straw, 1.2, 8, [-7, 1, 3], 2.5)
-  strip(C.blue, 1.2, 8, [7, 0, -2], 3)
-  strip(C.violet, 9, 1, [0, -6, 3], 1.6)
-  const pm = new PMREMGenerator(renderer)
-  const tex = pm.fromScene(env, 0.03).texture
-  pm.dispose()
-  return tex
 }
 
 function textTexture(label, { bg = null, fg = '#0e1114', font = '800 150px "Big Shoulders Display", sans-serif', size = 256 } = {}) {
@@ -212,57 +192,60 @@ const KINDS = { keys, grad, astro }
 const mouse = { x: -9999, y: -9999 }
 
 class Prop {
-  constructor(el, kind, { reduced }) {
+  constructor(el, kind, { reduced, host }) {
     this.el = el
+    this.kind = kind
     this.reduced = reduced
-    this.visible = true
+    this.host = host
+    this.visible = false
+    this.ready = false
     const canvas = (this.canvas = document.createElement('canvas'))
     canvas.className = 'prop__gl'
     canvas.setAttribute('aria-hidden', 'true')
     el.appendChild(canvas)
-    const r = (this.renderer = new WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' }))
-    r.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-    r.setClearColor(0x000000, 0)
-    r.toneMapping = ACESFilmicToneMapping
-    this.scene = new Scene()
-    this.env = makeEnv(r)
-    this.scene.environment = this.env
+    this.ctx = canvas.getContext('2d')
+    this.scene = host.guestScene()
+    this.env = host.env
+  }
+
+  // Built in steps, then its shaders compile in the host renderer (off the main thread; the suit's are
+  // already compiled there), and one frame is drawn before the canvas fades in.
+  async warm() {
+    const { el, kind, host } = this
+    if (kind === 'astro') await loadSuitTextures()
     this.camera = new PerspectiveCamera(28, 1, 0.1, 60)
-    this.scene.add(new HemisphereLight(0xffffff, 0x3a3f46, 0.7))
-    const key = new DirectionalLight(0xfff1e0, 2.2); key.position.set(3, 5, 5)
-    if (kind === 'astro') {
-      r.shadowMap.enabled = true
-      r.shadowMap.type = PCFSoftShadowMap
-      key.castShadow = true
-      key.shadow.mapSize.set(1024, 1024)
-      Object.assign(key.shadow.camera, { left: -2.2, right: 2.2, top: 2.2, bottom: -2.2, near: 0.5, far: 20 })
-      key.shadow.bias = -0.0004
-      key.shadow.normalBias = 0.02
-      key.shadow.radius = 4
-    }
-    const rim = new DirectionalLight(0x5b8ff0, 2.4); rim.position.set(-4, 2, -4)
-    const warm = new DirectionalLight(0xe2b04f, 1.2); warm.position.set(4, -2, -3)
-    this.scene.add(key, rim, warm)
+    this.scene.add(...host.guestRig({ shadow: kind === 'astro' }))
     this.obj = KINDS[kind](this)
     this.scene.add(this.obj.group)
     this.state = { mx: 0, my: 0, cx: 0, cy: 0, hover: 0, inside: false }
     this.hoverTarget = 0
-    const host = el.closest('[data-prop-host]') || el
-    host.addEventListener('pointerenter', () => { this.hoverTarget = 1 })
-    host.addEventListener('pointerleave', () => { this.hoverTarget = 0 })
-    if (this.obj.click) host.addEventListener('click', (e) => { if (!e.target.closest('a, button')) this.obj.click() })
+    const box = el.closest('[data-prop-host]') || el
+    box.addEventListener('pointerenter', () => { this.hoverTarget = 1 })
+    box.addEventListener('pointerleave', () => { this.hoverTarget = 0 })
+    if (this.obj.click) box.addEventListener('click', (e) => { if (!e.target.closest('a, button')) this.obj.click() })
     new ResizeObserver(() => this.resize()).observe(el)
     this.resize()
     this.start = performance.now()
     this.last = this.start
+    await yieldToMain()
+    await host.compileGuest(this)
+    await idle()
+    this.ready = true
     this.render(true)
-    requestAnimationFrame(() => canvas.classList.add('is-ready'))
+    requestAnimationFrame(() => this.canvas.classList.add('is-ready'))
+  }
+
+  // Page position, cached so rendering never has to ask the layout engine mid-frame.
+  measure() {
+    const r = this.el.getBoundingClientRect()
+    this.box = { left: r.left + window.scrollX, top: r.top + window.scrollY, width: r.width, height: r.height }
   }
 
   resize() {
+    this.measure()
     const w = this.el.clientWidth, h = this.el.clientHeight
     if (!w || !h) return
-    this.renderer.setSize(w, h, false)
+    this.w = w; this.h = h
     this.aspect = w / h
     this.camera.aspect = this.aspect
     const half = (this.camera.fov * Math.PI) / 360
@@ -274,9 +257,10 @@ class Prop {
     const now = performance.now()
     const dt = Math.min((now - this.last) / 1000, 0.1)
     this.last = now
-    if (!this.visible && !force) return
+    if (!this.ready || (!this.visible && !force)) return
     const t = this.reduced ? 0 : (now - this.start) / 1000
-    const r = this.el.getBoundingClientRect()
+    const b = this.box
+    const r = { left: b.left - window.scrollX, top: b.top - window.scrollY, width: b.width, height: b.height }
     const s = this.state
     const px = (mouse.x - r.left) / r.width, py = (mouse.y - r.top) / r.height
     s.inside = px >= 0 && px <= 1 && py >= 0 && py <= 1
@@ -287,22 +271,36 @@ class Prop {
     s.my += (clamp(-(mouse.y - (r.top + r.height / 2)) / Math.max(r.height, 300), -1, 1) - s.my) * k
     s.hover += (this.hoverTarget - s.hover) * Math.min(1, dt * 5)
     this.obj.update(t, this.reduced ? 0 : dt, s)
-    this.renderer.render(this.scene, this.camera)
+    this.host.drawGuest(this, t)
   }
 }
 
-export function mountProps({ reduced = false } = {}) {
+// Props are built one at a time in idle moments after the page settles, not when they scroll
+// into view, so building and compiling never lands in the middle of a scroll.
+export async function mountProps({ reduced = false, host } = {}) {
   const els = [...document.querySelectorAll('[data-prop]')]
   if (!els.length) return
   const props = []
   window.addEventListener('pointermove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY }, { passive: true })
   const io = new IntersectionObserver((entries) => entries.forEach((e) => {
-    const el = e.target
-    if (e.isIntersecting && !el._prop) {
-      try { el._prop = new Prop(el, el.dataset.prop, { reduced }); props.push(el._prop) } catch (err) { console.warn('3D prop unavailable', err); io.unobserve(el) }
-    }
-    if (el._prop) el._prop.visible = e.isIntersecting
+    e.target._visible = e.isIntersecting
+    if (e.target._prop) e.target._prop.visible = e.isIntersecting
   }), { rootMargin: '120px 0px' })
   els.forEach((el) => io.observe(el))
+  // Layout above a prop can shift (images, fonts, pinned sections): re-measure when the page resizes.
+  new ResizeObserver(() => props.forEach((p) => p.measure())).observe(document.body)
   gsap.ticker.add(() => { if (!document.hidden) for (const p of props) p.render() })
+
+  for (const el of els) {
+    await idle()
+    try {
+      const prop = new Prop(el, el.dataset.prop, { reduced, host })
+      await prop.warm()
+      prop.visible = !!el._visible
+      el._prop = prop
+      props.push(prop)
+    } catch (err) {
+      console.warn('3D prop unavailable', err)
+    }
+  }
 }
