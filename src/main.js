@@ -54,6 +54,22 @@ try {
 }
 lenis.on('scroll', ({ velocity }) => { if (gl) gl.scrollVel = velocity })
 
+/* ---------- Nav: hides while scrolling down, returns on a solid band so text never runs under it ---------- */
+function navScroll() {
+  const band = document.createElement('div')
+  band.className = 'nav-band'
+  band.setAttribute('aria-hidden', 'true')
+  $('.nav')?.before(band)
+  let hidden = false, solid = false
+  lenis.on('scroll', ({ scroll, direction }) => {
+    const s = scroll > 80
+    if (s !== solid) { solid = s; html.classList.toggle('nav-solid', s) }
+    const h = direction > 0 && scroll > innerHeight * 0.6
+    if (direction !== 0 && h !== hidden) { hidden = h; html.classList.toggle('nav-hidden', h) }
+  })
+}
+navScroll()
+
 /* ---------- Transitions, cursor, magnetic ---------- */
 const transitions = initTransitions({ reduced, onLeave: () => gl?.burst(1.1) })
 initCursor()
@@ -457,7 +473,16 @@ function archivePreview() {
   const setX = gsap.quickSetter(preview, 'x', 'px')
   const setY = gsap.quickSetter(preview, 'y', 'px')
   const setR = gsap.quickSetter(preview, 'rotation', 'deg')
+  const hide = () => {
+    shown = false
+    gsap.to(preview, { opacity: 0, scale: 0.6, duration: 0.5, ease: 'expo.out', overwrite: 'auto' })
+  }
   gsap.ticker.add(() => {
+    // Scrolling moves the list out from under a still cursor without a pointerleave: hide it then too.
+    if (shown) {
+      const r = list.getBoundingClientRect()
+      if (pos.y < r.top || pos.y > r.bottom || pos.x < r.left || pos.x > r.right) hide()
+    }
     if (!shown && Math.abs(pos.x - cur.x) < 0.5) return
     const dx = pos.x - cur.x
     cur.x += dx * 0.12
@@ -467,14 +492,11 @@ function archivePreview() {
   $$('.row', list).forEach((row, i) => {
     row.addEventListener('pointerenter', () => {
       gsap.to(track, { yPercent: -100 * i, duration: shown ? 0.8 : 0, ease: 'expo.out' })
-      if (!shown) gsap.to(preview, { opacity: 1, scale: 1, duration: 0.6, ease: 'expo.out' })
+      if (!shown) gsap.to(preview, { opacity: 1, scale: 1, duration: 0.6, ease: 'expo.out', overwrite: 'auto' })
       shown = true
     })
   })
-  list.addEventListener('pointerleave', () => {
-    shown = false
-    gsap.to(preview, { opacity: 0, scale: 0.6, duration: 0.5, ease: 'expo.out' })
-  })
+  list.addEventListener('pointerleave', hide)
 }
 
 function emailCopy() {
@@ -568,6 +590,7 @@ document.fonts.ready.then(() => {
   reveals()
   caseStudy()
   voyage()
+  if ($('[data-prop]')) import('./gl/props.js').then(({ mountProps }) => mountProps({ reduced })).catch((e) => console.warn(e))
   ScrollTrigger.refresh()
 })
 

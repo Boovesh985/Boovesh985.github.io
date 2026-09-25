@@ -74,7 +74,6 @@
 
         <div class="hero__bottom mono js-hero-fade">
           <span class="hero__scroll"><i></i>Scroll</span>
-          <span class="hero__hint"><span class="hint-desktop">Move your cursor to decrypt · hold to pull the particles</span><span class="hint-touch">Drag across the name to decrypt</span></span>
           <span class="hero__status"><span class="dot"></span>Open to internships &amp; graduate roles</span>
         </div>
       </section>
@@ -108,17 +107,20 @@
         </div>
 
         <div class="caps">
-          <article class="cap js-cap" data-tilt>
+          <article class="cap js-cap" data-tilt data-prop-host>
+            <div class="cap__3d" data-prop="agents"></div>
             <span class="cap__k mono">AI &amp; LLM systems</span>
             <h3 class="cap__h">Agents that check their own work</h3>
             <p>Multi-agent orchestration with LangGraph, RAG over vector stores, semantic caching and evaluation (Precision@k, MRR, NDCG, safety).</p>
           </article>
-          <article class="cap js-cap" data-tilt>
+          <article class="cap js-cap" data-tilt data-prop-host>
+            <div class="cap__3d" data-prop="cnn"></div>
             <span class="cap__k mono">Machine learning</span>
             <h3 class="cap__h">Models you can trust and explain</h3>
             <p>Deep learning with 1D-CNNs, explainability with SHAP and Grad-CAM, and privacy-preserving inference with homomorphic encryption.</p>
           </article>
-          <article class="cap js-cap" data-tilt>
+          <article class="cap js-cap" data-tilt data-prop-host>
+            <div class="cap__3d" data-prop="stack"></div>
             <span class="cap__k mono">Full-stack engineering</span>
             <h3 class="cap__h">Products that ship and scale</h3>
             <p>React, Node.js and PostgreSQL; JWT auth, payments and webhooks; REST APIs; Android builds with Capacitor; deploys on Vercel and Render.</p>
@@ -342,7 +344,10 @@
           <div class="marquee__row marquee__row--outline" data-dir="-1"><span>LangGraph · LangChain · FAISS · RAG · TensorFlow · Python ·&nbsp;</span><span>LangGraph · LangChain · FAISS · RAG · TensorFlow · Python ·&nbsp;</span></div>
         </div>
         <div class="stack__inner">
-          <p class="eyebrow mono js-decode">Toolkit</p>
+          <div class="sec-head" data-prop-host>
+            <p class="eyebrow mono js-decode">Toolkit</p>
+            <div class="sec-head__3d sec-head__3d--keys" data-prop="keys"></div>
+          </div>
           <div class="stack__grid js-stagger">
             <div class="stack__col"><h4 class="mono">Languages</h4><p>Python, Java, C, C++, JavaScript</p></div>
             <div class="stack__col"><h4 class="mono">Frontend</h4><p>React, Tailwind CSS, HTML/CSS, Three.js, GSAP</p></div>
@@ -356,7 +361,10 @@
 
       <!-- EDUCATION -->
       <section class="edu" data-shape="4" data-theme="light">
-        <p class="eyebrow mono js-decode">Education &amp; competitions</p>
+        <div class="sec-head" data-prop-host>
+          <p class="eyebrow mono js-decode">Education &amp; competitions</p>
+          <div class="sec-head__3d" data-prop="grad"></div>
+        </div>
         <div class="edu__grid">
           <div class="edu__item js-fade">
             <p class="edu__when mono">Expected May 2027</p>
@@ -375,7 +383,10 @@
       <!-- CONTACT -->
       <section class="contact" id="contact" data-shape="4" data-theme="dark">
         <p class="eyebrow mono js-decode">Contact</p>
-        <h2 class="contact__title js-lines">Let's build<br />something that<br /><span class="temper-text">has to work.</span></h2>
+        <div class="contact__main">
+          <h2 class="contact__title js-lines">Let's build<br />something that<br /><span class="temper-text">has to work.</span></h2>
+          <div class="contact__3d" data-prop="astro" data-prop-host data-cursor="Flip"></div>
+        </div>
         <div class="contact__actions">
           <button class="contact__email" data-magnetic data-burst data-email="boovesh985@gmail.com" data-cursor="Copy">
             <span class="contact__email-text">boovesh985@gmail.com</span>
@@ -389,7 +400,6 @@
         </div>
         <footer class="footer mono">
           <span>© 2026 Booveshwaran T</span>
-          <span>Built with Three.js, GSAP &amp; Lenis</span>
           <a href="#top" class="js-roll">Back to top ↑</a>
         </footer>
       </section>
