@@ -27,7 +27,8 @@ const $$ = (s, r = document) => [...r.querySelectorAll(s)]
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
 
 /* ---------- Smooth scroll ---------- */
-const lenis = new Lenis({ lerp: reduced ? 1 : 0.085, smoothWheel: !reduced })
+// Medium pace: each wheel notch travels ~70% of the browser default, with a slightly softer glide
+const lenis = new Lenis({ lerp: reduced ? 1 : 0.075, wheelMultiplier: 0.7, smoothWheel: !reduced })
 lenis.on('scroll', ScrollTrigger.update)
 gsap.ticker.add((t) => lenis.raf(t * 1000))
 gsap.ticker.lagSmoothing(0)
