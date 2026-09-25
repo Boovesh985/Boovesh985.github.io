@@ -1,7 +1,7 @@
 import {
   AdditiveBlending, BackSide, BoxGeometry, BufferAttribute, BufferGeometry, CanvasTexture, CircleGeometry, Color, CylinderGeometry,
   DirectionalLight, DoubleSide, Fog, Group, HalfFloatType, HemisphereLight, InstancedMesh, LinearFilter, Mesh, MeshBasicMaterial,
-  MeshStandardMaterial, NoBlending, Object3D, OrthographicCamera, PerspectiveCamera, PlaneGeometry, PMREMGenerator, PointLight, Points,
+  MeshStandardMaterial, NoBlending, PCFSoftShadowMap, Object3D, OrthographicCamera, PerspectiveCamera, PlaneGeometry, PMREMGenerator, PointLight, Points,
   Quaternion, Scene, ShaderMaterial, SphereGeometry, SRGBColorSpace, TorusGeometry, Vector3, WebGLRenderTarget, WebGLRenderer,
 } from 'three'
 import gsap from 'gsap'
@@ -141,6 +141,8 @@ export class Voyage {
 
     const r = (this.renderer = new WebGLRenderer({ canvas, alpha: true, antialias: false, powerPreference: 'high-performance' }))
     r.setClearColor(0x000000, 0)
+    r.shadowMap.enabled = true
+    r.shadowMap.type = PCFSoftShadowMap
     this.dpr = Math.min(window.devicePixelRatio, isMobile ? 1.5 : 1.35)
     r.setPixelRatio(this.dpr)
 
@@ -225,10 +227,15 @@ export class Voyage {
 
   #lights() {
     this.scene.add(new HemisphereLight(0x9fb4d8, 0x1a1210, 0.35))
-    const key = new DirectionalLight(0xfff0dc, 2.6)
-    key.position.set(4, 5, 4)
-    key.target.position.set(0, 0, -8)
-    this.camera.add(key, key.target)
+    // key light follows the astronaut so it can cast soft shadows across the suit
+    const key = (this.key = new DirectionalLight(0xfff0dc, 2.6))
+    key.castShadow = true
+    key.shadow.mapSize.set(1024, 1024)
+    Object.assign(key.shadow.camera, { left: -2.2, right: 2.2, top: 2.2, bottom: -2.2, near: 0.5, far: 20 })
+    key.shadow.bias = -0.0004
+    key.shadow.normalBias = 0.02
+    key.shadow.radius = 4
+    this.scene.add(key, key.target)
     this.rim = new DirectionalLight(0x2f63c2, 5)
     this.rim.position.set(-3, 2.5, -22)
     this.rim.target.position.set(0, 0, -6)
@@ -640,6 +647,8 @@ export class Voyage {
     })
     root.position.copy(pos)
     root.rotation.set(rx, ry, rz, 'YXZ')
+    this.key.target.position.copy(pos)
+    this.key.position.set(pos.x + 4, pos.y + 5, pos.z + 5)
 
     // DIVE letters
     const rise = smooth(seg(p, 0.07, 0.15))

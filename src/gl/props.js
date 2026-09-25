@@ -1,7 +1,7 @@
 import {
-  ACESFilmicToneMapping, BackSide, BufferAttribute, BufferGeometry, CanvasTexture, Color, ConeGeometry, CylinderGeometry, DirectionalLight,
-  DoubleSide, Euler, Group, HemisphereLight, IcosahedronGeometry, InstancedMesh, LineBasicMaterial, LineSegments, Mesh, MeshBasicMaterial,
-  MeshStandardMaterial, Object3D, PerspectiveCamera, PlaneGeometry, PMREMGenerator, Scene, SphereGeometry, SRGBColorSpace, TorusGeometry,
+  ACESFilmicToneMapping, PCFSoftShadowMap, BackSide, CanvasTexture, Color, ConeGeometry, CylinderGeometry, DirectionalLight,
+  DoubleSide, Group, HemisphereLight, Mesh, MeshBasicMaterial,
+  MeshStandardMaterial, PerspectiveCamera, PlaneGeometry, PMREMGenerator, Scene, SphereGeometry, SRGBColorSpace, TorusGeometry,
   Vector3, WebGLRenderer,
 } from 'three'
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js'
@@ -63,161 +63,6 @@ function textTexture(label, { bg = null, fg = '#0e1114', font = '800 150px "Big 
 }
 
 /* ---------- Kinds ---------- */
-
-// AI & LLM: a core with five agents orbiting it, messages running along the links.
-function agents() {
-  const g = new Group()
-  const core = new Mesh(new IcosahedronGeometry(0.6, 1), new MeshStandardMaterial({ color: 0x23282e, metalness: 0.9, roughness: 0.22, flatShading: true }))
-  const shell = new Mesh(new IcosahedronGeometry(0.74, 1), new MeshBasicMaterial({ color: C.straw, wireframe: true, transparent: true, opacity: 0.45 }))
-  g.add(core, shell)
-  const cols = [C.straw, C.bronze, C.violet, C.blue, C.frost]
-  const nodes = cols.map((c, i) => {
-    const m = new Mesh(new SphereGeometry(0.16, 24, 16), mat.glow(c, 0.7))
-    const tilt = new Euler(0.35 + i * 0.5, i * 1.3, (i % 2 ? 1 : -1) * 0.3)
-    const r = 1.35 + (i % 2) * 0.28
-    const ring = new Mesh(new TorusGeometry(r, 0.006, 6, 96), new MeshBasicMaterial({ color: 0x8a9199, transparent: true, opacity: 0.4 }))
-    ring.rotation.copy(tilt); ring.rotateX(Math.PI / 2)
-    g.add(m, ring)
-    return { m, tilt, r, a: (i / cols.length) * TAU, speed: 0.4 + i * 0.09 }
-  })
-  const pos = new Float32Array(20 * 3)
-  const lineGeo = new BufferGeometry()
-  lineGeo.setAttribute('position', new BufferAttribute(pos, 3))
-  const lines = new LineSegments(lineGeo, new LineBasicMaterial({ color: 0x8a9199, transparent: true, opacity: 0.55 }))
-  lines.frustumCulled = false
-  g.add(lines)
-  const packets = nodes.map(() => { const p = new Mesh(new SphereGeometry(0.045, 10, 8), mat.glow(C.straw, 2)); g.add(p); return p })
-  const v = new Vector3()
-  let tt = 0
-  return {
-    group: g, radius: 1.55,
-    update(t, dt, s) {
-      tt += dt * (1 + s.hover * 1.6)
-      nodes.forEach((n, i) => {
-        n.a += dt * n.speed * (1 + s.hover * 1.4)
-        const r = n.r * (1 + s.hover * 0.12)
-        v.set(Math.cos(n.a) * r, 0, Math.sin(n.a) * r).applyEuler(n.tilt)
-        n.m.position.copy(v)
-        pos.set([0, 0, 0, v.x, v.y, v.z], i * 6)
-        const next = nodes[(i + 1) % nodes.length].m.position
-        pos.set([v.x, v.y, v.z, next.x, next.y, next.z], 30 + i * 6)
-        const f = (tt * 0.8 + i * 0.37) % 1
-        packets[i].position.copy(v).multiplyScalar(i % 2 ? f : 1 - f)
-      })
-      lineGeo.attributes.position.needsUpdate = true
-      core.rotation.y += dt * 0.35; core.rotation.x += dt * 0.12
-      shell.rotation.y -= dt * 0.2
-      g.rotation.set(0.25 - s.my * 0.35, s.mx * 0.6, 0)
-    },
-  }
-}
-
-// Machine learning: feature maps shrinking through a CNN, an activation wave running through them.
-function cnn() {
-  const g = new Group()
-  const layers = [[7, 7, -1.75], [5, 5, -0.6], [4, 4, 0.45], [5, 1, 1.5]]
-  const cells = []
-  layers.forEach(([ny, nz, x], li) => {
-    for (let a = 0; a < ny; a++) for (let b = 0; b < nz; b++) cells.push({ li, p: [x, (a - (ny - 1) / 2) * 0.26, (b - (nz - 1) / 2) * 0.26] })
-  })
-  const box = new RoundedBoxGeometry(0.19, 0.19, 0.19, 2, 0.03)
-  const im = new InstancedMesh(box, new MeshStandardMaterial({ color: 0xffffff, roughness: 0.35, metalness: 0.2 }), cells.length)
-  const d = new Object3D()
-  cells.forEach((c, i) => {
-    d.position.set(...c.p)
-    if (c.li === 3) d.scale.set(1.5, 1.5, 1.5); else d.scale.set(0.55, 1, 1)
-    d.updateMatrix(); im.setMatrixAt(i, d.matrix)
-    im.setColorAt(i, new Color(0x2f63c2))
-  })
-  g.add(im)
-  // frustum lines between consecutive maps
-  const seg = []
-  for (let i = 0; i < layers.length - 1; i++) {
-    const [ay, az, ax] = layers[i], [by, bz, bx] = layers[i + 1]
-    ;[[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(([sy, sz]) => {
-      seg.push(ax, sy * (ay - 1) * 0.13, sz * (az - 1) * 0.13, bx, sy * (by - 1) * 0.13, sz * (bz - 1) * 0.13)
-    })
-  }
-  const lg = new BufferGeometry()
-  lg.setAttribute('position', new BufferAttribute(new Float32Array(seg), 3))
-  g.add(new LineSegments(lg, new LineBasicMaterial({ color: 0x8a9199, transparent: true, opacity: 0.5 })))
-  const base = new Color(C.blue), hot = new Color(C.straw), out = new Color(C.bronze), tmp = new Color()
-  let tt = 0
-  return {
-    group: g, radius: 1.55,
-    update(t, dt, s) {
-      tt += dt * (1 + s.hover * 1.8)
-      cells.forEach((c, i) => {
-        const ph = ((tt * 0.9 - c.li * 0.42) % 2.2 + 2.2) % 2.2
-        const k = Math.exp(-Math.pow((ph - 0.5) * 3.2, 2)) * (0.55 + 0.45 * Math.sin(i * 12.9898))
-        if (c.li === 3) tmp.copy(base).lerp(i % 5 === 2 ? hot : out, k * (i % 5 === 2 ? 1.6 : 0.5))
-        else tmp.copy(base).lerp(hot, clamp(k, 0, 1))
-        im.setColorAt(i, tmp)
-      })
-      im.instanceColor.needsUpdate = true
-      g.rotation.set(0.3 - s.my * 0.3, -0.62 + s.mx * 0.55 + Math.sin(t * 0.3) * 0.08, 0)
-    },
-  }
-}
-
-// Full-stack: interface, API and database layers that pull apart when you hover.
-function stack() {
-  const g = new Group()
-  const slab = new RoundedBoxGeometry(2.1, 0.24, 1.45, 4, 0.08)
-  // interface screen texture
-  const cv = document.createElement('canvas'); cv.width = 512; cv.height = 340
-  const x = cv.getContext('2d')
-  x.fillStyle = '#0e1114'; x.fillRect(0, 0, 512, 340)
-  x.fillStyle = C.straw; x.fillRect(24, 22, 180, 22)
-  x.fillStyle = '#3a4048'; x.fillRect(360, 24, 128, 18)
-  x.fillStyle = '#20252b'; [[24, 70], [186, 70], [348, 70]].forEach(([a, b]) => x.fillRect(a, b, 140, 150))
-  x.fillStyle = C.bronze; x.fillRect(24, 250, 150, 44)
-  x.fillStyle = '#3a4048'; x.fillRect(200, 262, 280, 18)
-  const tex = new CanvasTexture(cv); tex.colorSpace = SRGBColorSpace
-  const top = new Group()
-  top.add(new Mesh(slab, mat.white()))
-  const screen = new Mesh(new PlaneGeometry(1.78, 1.18), new MeshStandardMaterial({ map: tex, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.55, roughness: 0.3 }))
-  screen.rotation.x = -Math.PI / 2; screen.position.y = 0.122
-  top.add(screen)
-  const mid = new Group()
-  mid.add(new Mesh(slab, mat.steel()))
-  const ports = []
-  for (let i = 0; i < 6; i++) {
-    const p = new Mesh(new RoundedBoxGeometry(0.14, 0.07, 0.04, 2, 0.015), mat.glow(C.bronze, 1))
-    p.position.set(-0.6 + i * 0.24, 0, 0.73)
-    mid.add(p); ports.push(p)
-  }
-  const db = new Group()
-  const disc = new CylinderGeometry(0.62, 0.62, 0.17, 48)
-  for (let i = 0; i < 3; i++) {
-    const m = new Mesh(disc, i === 1 ? mat.ink() : mat.white())
-    m.position.y = -i * 0.21
-    const band = new Mesh(new TorusGeometry(0.625, 0.018, 8, 64), mat.glow(C.blue, 1.4))
-    band.rotation.x = Math.PI / 2; band.position.y = -i * 0.21 + 0.09
-    db.add(m, band)
-  }
-  g.add(top, mid, db)
-  const packets = [0, 1, 2].map((i) => { const p = new Mesh(new RoundedBoxGeometry(0.1, 0.1, 0.1, 2, 0.02), mat.glow(C.straw, 2)); g.add(p); return { p, o: i / 3 } })
-  let tt = 0
-  return {
-    group: g, radius: 1.45,
-    update(t, dt, s) {
-      tt += dt * (1 + s.hover)
-      const gap = 0.62 + s.hover * 0.3
-      top.position.y = gap + Math.sin(t * 1.1) * 0.03
-      mid.position.y = Math.sin(t * 1.1 + 1) * 0.03
-      db.position.y = -gap + 0.12 + Math.sin(t * 1.1 + 2) * 0.03
-      packets.forEach(({ p, o }) => {
-        const f = (tt * 0.45 + o) % 1
-        p.position.set(0.72, lerp(top.position.y - 0.14, db.position.y + 0.1, f), 0.45)
-        p.visible = f > 0.03 && f < 0.97
-      })
-      ports.forEach((p, i) => { p.material.emissiveIntensity = 0.4 + Math.max(0, Math.sin(tt * 4 - i * 0.8)) * 1.6 })
-      g.rotation.set(0.42 - s.my * 0.25, -0.65 + s.mx * 0.55 + Math.sin(t * 0.25) * 0.1, 0)
-    },
-  }
-}
-const lerp = (a, b, t) => a + (b - a) * t
 
 // Toolkit: keycaps that type on their own and press down under the cursor.
 function keys(prop) {
@@ -358,7 +203,7 @@ function astro(prop) {
   }
 }
 
-const KINDS = { agents, cnn, stack, keys, grad, astro }
+const KINDS = { keys, grad, astro }
 
 /* ---------- Runtime ---------- */
 
@@ -383,6 +228,16 @@ class Prop {
     this.camera = new PerspectiveCamera(28, 1, 0.1, 60)
     this.scene.add(new HemisphereLight(0xffffff, 0x3a3f46, 0.7))
     const key = new DirectionalLight(0xfff1e0, 2.2); key.position.set(3, 5, 5)
+    if (kind === 'astro') {
+      r.shadowMap.enabled = true
+      r.shadowMap.type = PCFSoftShadowMap
+      key.castShadow = true
+      key.shadow.mapSize.set(1024, 1024)
+      Object.assign(key.shadow.camera, { left: -2.2, right: 2.2, top: 2.2, bottom: -2.2, near: 0.5, far: 20 })
+      key.shadow.bias = -0.0004
+      key.shadow.normalBias = 0.02
+      key.shadow.radius = 4
+    }
     const rim = new DirectionalLight(0x5b8ff0, 2.4); rim.position.set(-4, 2, -4)
     const warm = new DirectionalLight(0xe2b04f, 1.2); warm.position.set(4, -2, -3)
     this.scene.add(key, rim, warm)

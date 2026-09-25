@@ -54,16 +54,10 @@ try {
 }
 lenis.on('scroll', ({ velocity }) => { if (gl) gl.scrollVel = velocity })
 
-/* ---------- Nav: hides while scrolling down, returns on a solid band so text never runs under it ---------- */
+/* ---------- Nav: slides away while scrolling down, returns when scrolling up ---------- */
 function navScroll() {
-  const band = document.createElement('div')
-  band.className = 'nav-band'
-  band.setAttribute('aria-hidden', 'true')
-  $('.nav')?.before(band)
-  let hidden = false, solid = false
+  let hidden = false
   lenis.on('scroll', ({ scroll, direction }) => {
-    const s = scroll > 80
-    if (s !== solid) { solid = s; html.classList.toggle('nav-solid', s) }
     const h = direction > 0 && scroll > innerHeight * 0.6
     if (direction !== 0 && h !== hidden) { hidden = h; html.classList.toggle('nav-hidden', h) }
   })
