@@ -657,8 +657,9 @@ a:hover .roll__c, button:hover .roll__c { transform: translateY(-1.25em); }
 .sec-head { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--gutter); margin-bottom: 28px; }
 .sec-head .eyebrow { margin-bottom: 0; }
 .sec-head__3d { width: min(360px, 38vw); height: min(260px, 26vw); flex: none; }
-.sec-head__3d--keys { width: min(460px, 44vw); }
+.sec-head__3d--keys { width: min(520px, 46vw); height: min(300px, 28vw); }
 @media (max-width: 900px) {
   .sec-head { flex-direction: column-reverse; align-items: stretch; }
-  .sec-head__3d, .sec-head__3d--keys { width: 100%; height: 220px; }
+  .sec-head__3d { width: 100%; height: 220px; }
+  .sec-head__3d--keys { width: 100%; height: 250px; }
 }

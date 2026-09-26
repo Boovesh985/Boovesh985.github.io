@@ -35,6 +35,8 @@ function textTexture(label, { bg = null, fg = '#0e1114', font = '800 150px "Big 
   x.font = font
   x.textAlign = 'center'
   x.textBaseline = 'middle'
+  const w = x.measureText(label).width, max = size * 0.8 // shrink longer labels to fit
+  if (w > max) x.font = font.replace(/(\d+)px/, (_, n) => `${Math.floor((n * max) / w)}px`)
   x.fillText(label, size / 2, size / 2 + size * 0.04)
   const t = new CanvasTexture(c)
   t.colorSpace = SRGBColorSpace
@@ -47,8 +49,18 @@ function textTexture(label, { bg = null, fg = '#0e1114', font = '800 150px "Big 
 // Toolkit: keycaps that type on their own and press down under the cursor.
 function keys(prop) {
   const g = new Group()
-  const labels = ['Py', 'JS', 'C++', 'SQL', 'API', 'RAG', 'Git', '{ }']
-  const bodies = ['#eceef0', C.ink, '#eceef0', C.straw, '#eceef0', C.bronze, C.ink, '#eceef0']
+  const W = '#eceef0', COLS = 5
+  const labels = [
+    'Py', 'JS', 'SQL', 'Java', 'AI',
+    'API', 'RAG', 'Git', '{ }', 'LLM',
+    'Node', 'React', 'ML', 'CSS', 'npm',
+  ]
+  const bodies = [
+    W, C.ink, C.straw, W, W,
+    W, C.bronze, C.ink, W, C.straw,
+    C.ink, W, C.bronze, W, W,
+  ]
+  const rows = Math.ceil(labels.length / COLS)
   const cap = new RoundedBoxGeometry(0.92, 0.42, 0.92, 4, 0.13)
   const list = labels.map((l, i) => {
     const dark = bodies[i] === C.ink
@@ -60,8 +72,8 @@ function keys(prop) {
     }))
     face.rotation.x = -Math.PI / 2; face.position.y = 0.212
     k.add(body, face)
-    const col = i % 4, row = (i / 4) | 0
-    k.userData = { x: (col - 1.5) * 1.08 + row * 0.3, z: (row - 0.5) * 1.1, ph: i * 1.7, press: 0, face }
+    const col = i % COLS, row = (i / COLS) | 0, r = row - (rows - 1) / 2
+    k.userData = { x: (col - (COLS - 1) / 2) * 1.08 + r * 0.3, z: r * 1.1, ph: i * 1.7, press: 0, face }
     k.rotation.y = (Math.sin(i * 3.1) * 0.12)
     g.add(k)
     return k
@@ -69,7 +81,7 @@ function keys(prop) {
   const v = new Vector3()
   let nextTap = 0
   return {
-    group: g, radius: 1.62,
+    group: g, radius: 2.2,
     update(t, dt, s) {
       if (t > nextTap) { // type a key every so often
         nextTap = t + 0.35 + Math.random() * 0.5
