@@ -8,7 +8,13 @@
     <meta name="theme-color" content="#0E1114" />
     <meta property="og:title" content="Encrypted ECG Diagnosis — Booveshwaran T" />
     <meta property="og:description" content="A 1D-CNN that classifies heartbeats into five arrhythmia classes, explains each decision with SHAP and Grad-CAM, and runs its cloud inference on CKKS-encrypted data, so the server never sees a raw heartbeat." />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://boovesh985.github.io/projects/encrypted-ecg/" />
+    <meta property="og:image" content="https://boovesh985.github.io/og.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href="https://boovesh985.github.io/projects/encrypted-ecg/" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <script>try{if(sessionStorage.getItem('bt-transition'))document.documentElement.classList.add('is-arriving')}catch(e){}</script>
   </head>
   <body data-page="project" data-shape="3">
@@ -55,11 +61,11 @@
 
       <section class="cs-overview" data-theme="dark">
         <div class="cs-overview__col">
-          <p class="eyebrow mono js-decode">The problem</p>
+          <h2 class="eyebrow mono js-decode">The problem</h2>
           <p class="cs-lead js-fade">Deep learning reads ECGs accurately, but it has two problems in a clinic: nobody can see why it called a beat ventricular rather than normal, and cloud analysis means sending a patient's raw cardiac signal to someone else's server.</p>
         </div>
         <div class="cs-overview__col">
-          <p class="eyebrow mono js-decode">What I built</p>
+          <h2 class="eyebrow mono js-decode">What I built</h2>
           <p class="cs-body js-fade">An end-to-end pipeline on the MIT-BIH Arrhythmia dataset (109,446 annotated beats). A 1D-CNN learns each heartbeat, SHAP and Grad-CAM explain the result, and CKKS homomorphic encryption lets the cloud classify the beat without decrypting it. A Streamlit app walks through every step, live on Hugging Face.</p>
         </div>
       </section>
@@ -84,7 +90,7 @@
       </section>
 
       <section class="cs-decisions" data-theme="dark">
-        <p class="eyebrow mono js-decode">Decisions worth noting</p>
+        <h2 class="eyebrow mono js-decode">Decisions worth noting</h2>
         <div class="cs-decisions__grid">
           <article class="cs-decision js-fade"><h3>Make the network encryption-friendly</h3><p>CKKS can only add and multiply, so batch-norm layers were folded into the adjacent dense weights and ReLU was replaced with an x² activation.</p></article>
           <article class="cs-decision js-fade"><h3>Two explanations for every beat</h3><p>SHAP DeepExplainer works on the 45 clinical features, and Grad-CAM works on the raw waveform. RR variability dominates normal beats; QRS duration dominates ventricular ones.</p></article>
@@ -94,7 +100,7 @@
 
       <section class="cs-gallery" data-theme="dark">
         <div class="cs-gallery__head">
-          <p class="eyebrow mono js-decode">Gallery</p>
+          <h2 class="eyebrow mono js-decode">Gallery</h2>
           <p class="cs-gallery__count mono"><span class="js-gcount">01</span> / 08</p>
         </div>
         <div class="cs-gallery__track">
@@ -110,7 +116,7 @@
       </section>
 
       <section class="cs-stack" data-theme="dark">
-        <p class="eyebrow mono js-decode">Built with</p>
+        <h2 class="eyebrow mono js-decode">Built with</h2>
         <dl class="spec__table cs-stack__table mono js-stagger">
           <div><dt>Deep learning</dt><dd>TensorFlow / Keras 1D-CNN</dd></div>
           <div><dt>Encryption</dt><dd>TenSEAL (Microsoft SEAL), CKKS scheme</dd></div>

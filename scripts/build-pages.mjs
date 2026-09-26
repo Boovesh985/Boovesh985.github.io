@@ -37,7 +37,13 @@ function page(p, i) {
     <meta name="theme-color" content="#0E1114" />
     <meta property="og:title" content="${esc(title)} — Booveshwaran T" />
     <meta property="og:description" content="${esc(p.summary)}" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://boovesh985.github.io/projects/${p.slug}/" />
+    <meta property="og:image" content="https://boovesh985.github.io/og.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href="https://boovesh985.github.io/projects/${p.slug}/" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <script>try{if(sessionStorage.getItem('bt-transition'))document.documentElement.classList.add('is-arriving')}catch(e){}</script>
   </head>
   <body data-page="project" data-shape="${p.shape}">
@@ -84,11 +90,11 @@ function page(p, i) {
 
       <section class="cs-overview" data-theme="dark">
         <div class="cs-overview__col">
-          <p class="eyebrow mono js-decode">The problem</p>
+          <h2 class="eyebrow mono js-decode">The problem</h2>
           <p class="cs-lead js-fade">${esc(p.problem)}</p>
         </div>
         <div class="cs-overview__col">
-          <p class="eyebrow mono js-decode">What I built</p>
+          <h2 class="eyebrow mono js-decode">What I built</h2>
           <p class="cs-body js-fade">${esc(p.built)}</p>
         </div>
       </section>
@@ -106,7 +112,7 @@ function page(p, i) {
       </section>
 
       <section class="cs-decisions" data-theme="dark">
-        <p class="eyebrow mono js-decode">${esc(p.decisionsTitle)}</p>
+        <h2 class="eyebrow mono js-decode">${esc(p.decisionsTitle)}</h2>
         <div class="cs-decisions__grid">
           ${p.decisions.map(([h, d]) => `<article class="cs-decision js-fade"><h3>${esc(h)}</h3><p>${esc(d)}</p></article>`).join('\n          ')}
         </div>
@@ -114,7 +120,7 @@ function page(p, i) {
 ${p.gallery.length ? `
       <section class="cs-gallery" data-theme="dark">
         <div class="cs-gallery__head">
-          <p class="eyebrow mono js-decode">Gallery</p>
+          <h2 class="eyebrow mono js-decode">Gallery</h2>
           <p class="cs-gallery__count mono"><span class="js-gcount">01</span> / ${String(p.gallery.length).padStart(2, '0')}</p>
         </div>
         <div class="cs-gallery__track">
@@ -123,7 +129,7 @@ ${p.gallery.length ? `
       </section>` : ''}
 
       <section class="cs-stack" data-theme="dark">
-        <p class="eyebrow mono js-decode">Built with</p>
+        <h2 class="eyebrow mono js-decode">Built with</h2>
         <dl class="spec__table cs-stack__table mono js-stagger">
           ${p.stack.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('\n          ')}
         </dl>
