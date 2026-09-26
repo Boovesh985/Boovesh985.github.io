@@ -164,7 +164,8 @@ export class GL {
     this.sceneRT.setSize(Math.floor(w * this.dpr), Math.floor(h * this.dpr))
     this.trailMat.uniforms.uAspect.value = w / h
     // Keep shapes a sensible size on portrait screens
-    this.baseScale = Math.min(1, (w / h) * 0.95 + 0.25)
+    // (and on short phones, where the hero text leaves less room around the shape)
+    this.baseScale = Math.min(1, (w / h) * 0.95 + 0.25) * (this.isMobile && h > w ? Math.min(1, Math.max(0.8, h / 800)) : 1)
     // Re-target the layout for the new size without resetting a morph in progress
     const L = this.#layout(this.shape)
     this.target.x = L.x; this.target.y = L.y; this.target.scale = L.s * this.baseScale

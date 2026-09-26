@@ -372,6 +372,7 @@ async function voyage(onProgress = () => {}) {
   const num = $('.js-vl-n', sec)
   const name = $('.js-vl-name', sec)
   const tools = $('.js-vl-tools', sec)
+  if (touch) hint.textContent = 'Scroll to dive · tap to flip'
   name.innerHTML = `<span>${name.textContent}</span>`
   const nameInner = name.firstChild
 

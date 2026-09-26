@@ -65,15 +65,17 @@ function keys(prop) {
   const list = labels.map((l, i) => {
     const dark = bodies[i] === C.ink
     const k = new Group()
-    const body = new Mesh(cap, new MeshStandardMaterial({ color: bodies[i], roughness: 0.42, metalness: dark ? 0.3 : 0.05 }))
+    // a pressed key lights its cap, not its label, so the legend stays readable on every colour
+    const body = new Mesh(cap, new MeshStandardMaterial({
+      color: bodies[i], roughness: 0.42, metalness: dark ? 0.3 : 0.05, emissive: new Color(C.straw), emissiveIntensity: 0,
+    }))
     const face = new Mesh(new PlaneGeometry(0.72, 0.72), new MeshStandardMaterial({
       map: textTexture(l, { fg: dark ? '#e9e6df' : '#0e1114' }), transparent: true, roughness: 0.5,
-      emissive: new Color(C.straw), emissiveIntensity: 0,
     }))
     face.rotation.x = -Math.PI / 2; face.position.y = 0.212
     k.add(body, face)
     const col = i % COLS, row = (i / COLS) | 0, r = row - (rows - 1) / 2
-    k.userData = { x: (col - (COLS - 1) / 2) * 1.08 + r * 0.3, z: r * 1.1, ph: i * 1.7, press: 0, face }
+    k.userData = { x: (col - (COLS - 1) / 2) * 1.08 + r * 0.3, z: r * 1.1, ph: i * 1.7, press: 0, glow: body.material, dark }
     k.rotation.y = (Math.sin(i * 3.1) * 0.12)
     g.add(k)
     return k
@@ -96,7 +98,7 @@ function keys(prop) {
         u.press = Math.max(u.press - dt * 2.6, near ? 1 : 0)
         const p = smooth(clamp(u.press, 0, 1))
         k.position.y -= p * 0.16
-        u.face.material.emissiveIntensity = p * 0.9
+        u.glow.emissiveIntensity = p * (u.dark ? 0.55 : 0.28)
       })
       g.rotation.set(0.95 - s.my * 0.2, s.mx * 0.35 + Math.sin(t * 0.3) * 0.06, 0)
     },

@@ -8,7 +8,13 @@
     <meta name="theme-color" content="#0E1114" />
     <meta property="og:title" content="Steel E-Commerce — Booveshwaran T" />
     <meta property="og:description" content="A B2C and B2B marketplace for industrial steel (TMT bars, pipes, sheets and structural sections) that ships as a website and a signed Android app from one React codebase." />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://boovesh985.github.io/projects/steel-commerce/" />
+    <meta property="og:image" content="https://boovesh985.github.io/og.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href="https://boovesh985.github.io/projects/steel-commerce/" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <script>try{if(sessionStorage.getItem('bt-transition'))document.documentElement.classList.add('is-arriving')}catch(e){}</script>
   </head>
   <body data-page="project" data-shape="1">
@@ -54,11 +60,11 @@
 
       <section class="cs-overview" data-theme="dark">
         <div class="cs-overview__col">
-          <p class="eyebrow mono js-decode">The problem</p>
+          <h2 class="eyebrow mono js-decode">The problem</h2>
           <p class="cs-lead js-fade">Buying steel usually means phone calls, WhatsApp price lists and rates that change every week. Buyers can't compare grades or check stock, and suppliers track orders by hand.</p>
         </div>
         <div class="cs-overview__col">
-          <p class="eyebrow mono js-decode">What I built</p>
+          <h2 class="eyebrow mono js-decode">What I built</h2>
           <p class="cs-body js-fade">A catalogue of 270+ real products with specifications, per-kilo pricing and live stock; cart, wishlist and order tracking from pending to delivered; Razorpay payments with automatic refunds on cancellation; and an admin panel for analytics, warehouse inventory and fulfilment.</p>
         </div>
       </section>
@@ -83,7 +89,7 @@
       </section>
 
       <section class="cs-decisions" data-theme="dark">
-        <p class="eyebrow mono js-decode">Decisions worth noting</p>
+        <h2 class="eyebrow mono js-decode">Decisions worth noting</h2>
         <div class="cs-decisions__grid">
           <article class="cs-decision js-fade"><h3>Split auth from catalogue</h3><p>Credentials and payment data sit physically apart from the public catalogue, and catalogue reads scale without touching transactional writes.</p></article>
           <article class="cs-decision js-fade"><h3>Rotate refresh tokens</h3><p>Short-lived access tokens, 30-day refresh tokens that rotate on use, and Argon2id hashing that migrates older bcrypt hashes when users sign in.</p></article>
@@ -93,7 +99,7 @@
 
       <section class="cs-gallery" data-theme="dark">
         <div class="cs-gallery__head">
-          <p class="eyebrow mono js-decode">Gallery</p>
+          <h2 class="eyebrow mono js-decode">Gallery</h2>
           <p class="cs-gallery__count mono"><span class="js-gcount">01</span> / 02</p>
         </div>
         <div class="cs-gallery__track">
@@ -103,7 +109,7 @@
       </section>
 
       <section class="cs-stack" data-theme="dark">
-        <p class="eyebrow mono js-decode">Built with</p>
+        <h2 class="eyebrow mono js-decode">Built with</h2>
         <dl class="spec__table cs-stack__table mono js-stagger">
           <div><dt>Frontend</dt><dd>React 19, Vite, Tailwind CSS v4, Zustand, TanStack Query, React Router</dd></div>
           <div><dt>Backend</dt><dd>Node.js 20, Express 5, Prisma (two clients), Zod</dd></div>
