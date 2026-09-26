@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Multi-Agent Clinical Reasoning — Booveshwaran T</title>
+    <meta name="description" content="Five LLM agents, orchestrated with LangGraph, that plan, research, review, refine and answer clinical questions, plus a cache that answers repeat questions instantly." />
+    <meta name="theme-color" content="#0E1114" />
+    <meta property="og:title" content="Multi-Agent Clinical Reasoning — Booveshwaran T" />
+    <meta property="og:description" content="Five LLM agents, orchestrated with LangGraph, that plan, research, review, refine and answer clinical questions, plus a cache that answers repeat questions instantly." />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://boovesh985.github.io/projects/clinical-agents/" />
+    <meta property="og:image" content="https://boovesh985.github.io/og.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href="https://boovesh985.github.io/projects/clinical-agents/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <script>try{if(sessionStorage.getItem('bt-transition'))document.documentElement.classList.add('is-arriving')}catch(e){}</script>
+    <script type="module" crossorigin src="/assets/main-fx_JYje8.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/main-oux66v4W.css">
+  </head>
+  <body data-page="project" data-shape="2">
+    <div class="curtain" aria-hidden="true"><div class="curtain__inner"><span class="curtain__eyebrow mono">Opening</span><span class="curtain__label"></span></div></div>
+    <div class="wipe" aria-hidden="true"></div>
+    <canvas class="gl" aria-hidden="true"></canvas>
+    <div class="cursor" aria-hidden="true"><div class="cursor__ring"><span class="cursor__label"></span></div><div class="cursor__dot"></div></div>
+
+    <header class="nav">
+      <a href="/" class="nav__brand" data-transition="Home" data-magnetic aria-label="Home">
+        <span class="nav__mark">BT</span>
+        <span class="nav__name mono js-hover-scramble">Booveshwaran T</span>
+      </a>
+      <nav class="nav__links mono" aria-label="Primary">
+        <a href="/#work" data-transition="Selected work" class="js-roll">Work</a>
+        <a href="/#about" data-transition="About" class="js-roll">About</a>
+        <a href="/#contact" data-transition="Contact" class="js-roll">Contact</a>
+      </nav>
+      <div class="nav__time mono"><span class="dot"></span><span class="js-clock">--:--</span> IST</div>
+    </header>
+
+    <main id="top" class="cs" data-accent="violet">
+      <section class="cs-hero" data-shape="2" data-theme="dark">
+        <a class="cs-back mono js-hero-fade" href="/#work" data-transition="Selected work">← All work</a>
+        <div class="cs-hero__main">
+          <p class="chapter__label mono js-decode">Agentic AI · Healthcare</p>
+          <h1 class="cs-title" aria-label="Multi-Agent Clinical Reasoning">
+            <span class="hero__name-inner"><span class="hero__layer hero__layer--cipher" aria-hidden="true">Multi-Agent<br />Clinical Reasoning</span><span class="hero__layer hero__layer--plain" aria-hidden="true">Multi-Agent<br />Clinical Reasoning</span></span>
+          </h1>
+          <p class="cs-summary js-hero-fade">Five LLM agents, orchestrated with LangGraph, that plan, research, review, refine and answer clinical questions, plus a cache that answers repeat questions instantly.</p>
+        </div>
+        <dl class="cs-meta mono js-hero-fade">
+          <div><dt>Year</dt><dd>2026</dd></div>
+          <div><dt>Discipline</dt><dd>Agentic AI · Healthcare</dd></div>
+          <div><dt>Stack</dt><dd>LangGraph · FAISS · FastAPI · Mistral · Llama 3.3</dd></div>
+          <div><dt>Links</dt><dd><a href="https://github.com/Boovesh985/multi_agent_llm" target="_blank" rel="noopener">View source ↗</a></dd></div>
+        </dl>
+      </section>
+
+      <section class="cs-cover" data-shape="2" data-theme="dark">
+        <figure class="shot js-cover"><div class="shot__frame shot__frame--square cs-cover__frame"><img src="/img/agents-arch.webp" width="1024" height="1024" alt="Multi-agent clinical reasoning pipeline diagram" loading="lazy" decoding="async" /></div></figure>
+      </section>
+
+      <section class="cs-overview" data-theme="dark">
+        <div class="cs-overview__col">
+          <h2 class="eyebrow mono js-decode">The problem</h2>
+          <p class="cs-lead js-fade">A single LLM call can answer a medical question confidently and wrongly. A clinical answer needs evidence behind it, a second look for safety, and a way to check that retrieval found the right sources.</p>
+        </div>
+        <div class="cs-overview__col">
+          <h2 class="eyebrow mono js-decode">What I built</h2>
+          <p class="cs-body js-fade">A LangGraph state graph of five specialised agents across two model providers, retrieval over 100+ curated medical documents, a semantic response cache, a FastAPI service that streams each agent's progress over SSE, and a benchmark that scores answers and retrieval separately.</p>
+        </div>
+      </section>
+
+      <section class="cs-flow" data-theme="light">
+        <p class="eyebrow mono js-decode">Sequence</p>
+        <h2 class="cs-h2 js-lines">How a question moves through the graph</h2>
+        <ol class="cs-flow__list">
+          <li class="cs-step js-step"><span class="cs-step__n">01</span><h3 class="cs-step__title">Cache lookup</h3><p class="cs-step__text">An exact hash match first, then a semantic match at 88% cosine similarity or higher. A hit returns immediately.</p></li>
+          <li class="cs-step js-step"><span class="cs-step__n">02</span><h3 class="cs-step__title">Clinical Planner</h3><p class="cs-step__text">Mistral breaks the question into differential-diagnosis steps.</p></li>
+          <li class="cs-step js-step"><span class="cs-step__n">03</span><h3 class="cs-step__title">Medical Researcher</h3><p class="cs-step__text">Llama 3.3 70B retrieves evidence from the FAISS index of medical documents.</p></li>
+          <li class="cs-step js-step"><span class="cs-step__n">04</span><h3 class="cs-step__title">Medical Reviewer</h3><p class="cs-step__text">Mistral scores clinical accuracy, drug interactions and safety out of 10.</p></li>
+          <li class="cs-step js-step"><span class="cs-step__n">05</span><h3 class="cs-step__title">Clinical Refiner</h3><p class="cs-step__text">Answers scoring under 7 are corrected and sent back for review, up to twice.</p></li>
+          <li class="cs-step js-step"><span class="cs-step__n">06</span><h3 class="cs-step__title">Medical Advisor</h3><p class="cs-step__text">Writes the final answer with a medical disclaimer, then stores it in the cache.</p></li>
+        </ol>
+      </section>
+
+      <section class="cs-figures" data-theme="light">
+        <div class="cs-figure js-figure"><span class="cs-figure__n">5</span><span class="cs-figure__l mono">specialised agents</span></div>
+        <div class="cs-figure js-figure"><span class="cs-figure__n">100+</span><span class="cs-figure__l mono">curated medical documents</span></div>
+        <div class="cs-figure js-figure"><span class="cs-figure__n">18</span><span class="cs-figure__l mono">medical specialties</span></div>
+        <div class="cs-figure js-figure"><span class="cs-figure__n">~60%</span><span class="cs-figure__l mono">fewer inter-agent tokens</span></div>
+      </section>
+
+      <section class="cs-decisions" data-theme="dark">
+        <h2 class="eyebrow mono js-decode">Decisions worth noting</h2>
+        <div class="cs-decisions__grid">
+          <article class="cs-decision js-fade"><h3>Route models by role</h3><p>Mistral plans and reviews; Llama 3.3 70B on NVIDIA NIM researches, refines and advises. Each agent has its own token budget.</p></article>
+          <article class="cs-decision js-fade"><h3>Compress agent-to-agent messages</h3><p>Inspired by LatentMAS, intermediate messages are compressed, cutting about 60% of tokens. Only the advisor writes a full answer.</p></article>
+          <article class="cs-decision js-fade"><h3>Measure retrieval, not just answers</h3><p>Precision@5, Recall@5, MRR and NDCG score what was retrieved. Keyword F1 and a safety check score what was said.</p></article>
+        </div>
+      </section>
+
+
+      <section class="cs-stack" data-theme="dark">
+        <h2 class="eyebrow mono js-decode">Built with</h2>
+        <dl class="spec__table cs-stack__table mono js-stagger">
+          <div><dt>Language</dt><dd>Python</dd></div>
+          <div><dt>Orchestration</dt><dd>LangGraph, LangChain</dd></div>
+          <div><dt>Models</dt><dd>Mistral AI, NVIDIA NIM (Llama 3.3 70B)</dd></div>
+          <div><dt>Retrieval</dt><dd>FAISS, SentenceTransformers (all-MiniLM-L6-v2)</dd></div>
+          <div><dt>Caching</dt><dd>Semantic response cache (CAG), SHA-256 prompt-prefix KV cache</dd></div>
+          <div><dt>API</dt><dd>FastAPI with server-sent events</dd></div>
+          <div><dt>Frontend</dt><dd>HTML, Three.js, GSAP</dd></div>
+        </dl>
+        <div class="spec__links">
+          <a class="btn " href="https://github.com/Boovesh985/multi_agent_llm" target="_blank" rel="noopener" data-magnetic><span class="js-roll">View source</span> <span>↗</span></a>
+        </div>
+      </section>
+
+      <section class="cs-next" data-shape="3" data-theme="dark">
+        <a href="/projects/encrypted-ecg/" data-transition="Encrypted ECG Diagnosis" class="cs-next__link" data-cursor="Next" data-burst>
+          <span class="eyebrow mono">Next project</span>
+          <span class="cs-next__title">Encrypted<br />ECG Diagnosis</span>
+          <span class="cs-next__label mono">Deep learning · 1D-CNN · Encrypted ECG</span>
+        </a>
+        <footer class="footer mono">
+          <span>© 2026 Booveshwaran T</span>
+          <a href="/" data-transition="Home" class="js-roll">Home</a>
+          <a href="#top" class="js-roll">Back to top ↑</a>
+        </footer>
+      </section>
+    </main>
+
+  </body>
+</html>

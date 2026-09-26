@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Steel E-Commerce — Booveshwaran T</title>
+    <meta name="description" content="A B2C and B2B marketplace for industrial steel (TMT bars, pipes, sheets and structural sections) that ships as a website and a signed Android app from one React codebase." />
+    <meta name="theme-color" content="#0E1114" />
+    <meta property="og:title" content="Steel E-Commerce — Booveshwaran T" />
+    <meta property="og:description" content="A B2C and B2B marketplace for industrial steel (TMT bars, pipes, sheets and structural sections) that ships as a website and a signed Android app from one React codebase." />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://boovesh985.github.io/projects/steel-commerce/" />
+    <meta property="og:image" content="https://boovesh985.github.io/og.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href="https://boovesh985.github.io/projects/steel-commerce/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <script>try{if(sessionStorage.getItem('bt-transition'))document.documentElement.classList.add('is-arriving')}catch(e){}</script>
+    <script type="module" crossorigin src="/assets/main-fx_JYje8.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/main-oux66v4W.css">
+  </head>
+  <body data-page="project" data-shape="1">
+    <div class="curtain" aria-hidden="true"><div class="curtain__inner"><span class="curtain__eyebrow mono">Opening</span><span class="curtain__label"></span></div></div>
+    <div class="wipe" aria-hidden="true"></div>
+    <canvas class="gl" aria-hidden="true"></canvas>
+    <div class="cursor" aria-hidden="true"><div class="cursor__ring"><span class="cursor__label"></span></div><div class="cursor__dot"></div></div>
+
+    <header class="nav">
+      <a href="/" class="nav__brand" data-transition="Home" data-magnetic aria-label="Home">
+        <span class="nav__mark">BT</span>
+        <span class="nav__name mono js-hover-scramble">Booveshwaran T</span>
+      </a>
+      <nav class="nav__links mono" aria-label="Primary">
+        <a href="/#work" data-transition="Selected work" class="js-roll">Work</a>
+        <a href="/#about" data-transition="About" class="js-roll">About</a>
+        <a href="/#contact" data-transition="Contact" class="js-roll">Contact</a>
+      </nav>
+      <div class="nav__time mono"><span class="dot"></span><span class="js-clock">--:--</span> IST</div>
+    </header>
+
+    <main id="top" class="cs" data-accent="straw">
+      <section class="cs-hero" data-shape="1" data-theme="dark">
+        <a class="cs-back mono js-hero-fade" href="/#work" data-transition="Selected work">← All work</a>
+        <div class="cs-hero__main">
+          <p class="chapter__label mono js-decode">Full-stack · Web + Android</p>
+          <h1 class="cs-title" aria-label="Steel E-Commerce">
+            <span class="hero__name-inner"><span class="hero__layer hero__layer--cipher" aria-hidden="true">Steel<br />E-Commerce</span><span class="hero__layer hero__layer--plain" aria-hidden="true">Steel<br />E-Commerce</span></span>
+          </h1>
+          <p class="cs-summary js-hero-fade">A B2C and B2B marketplace for industrial steel (TMT bars, pipes, sheets and structural sections) that ships as a website and a signed Android app from one React codebase.</p>
+        </div>
+        <dl class="cs-meta mono js-hero-fade">
+          <div><dt>Year</dt><dd>2026</dd></div>
+          <div><dt>Discipline</dt><dd>Full-stack · Web + Android</dd></div>
+          <div><dt>Stack</dt><dd>React 19 · Express 5 · PostgreSQL · Capacitor</dd></div>
+          <div><dt>Links</dt><dd><a href="https://amk-steels.vercel.app" target="_blank" rel="noopener">Visit live site ↗</a><br /><a href="https://github.com/Boovesh985/Steel-E-Commerce-platform" target="_blank" rel="noopener">Source ↗</a></dd></div>
+        </dl>
+      </section>
+
+      <section class="cs-cover" data-shape="1" data-theme="dark">
+        <figure class="shot js-cover"><div class="shot__frame cs-cover__frame"><img src="/img/steel-home.webp" width="1600" height="900" alt="Steel e-commerce homepage with per-kilo pricing cards" loading="lazy" decoding="async" /></div></figure>
+      </section>
+
+      <section class="cs-overview" data-theme="dark">
+        <div class="cs-overview__col">
+          <h2 class="eyebrow mono js-decode">The problem</h2>
+          <p class="cs-lead js-fade">Buying steel usually means phone calls, WhatsApp price lists and rates that change every week. Buyers can't compare grades or check stock, and suppliers track orders by hand.</p>
+        </div>
+        <div class="cs-overview__col">
+          <h2 class="eyebrow mono js-decode">What I built</h2>
+          <p class="cs-body js-fade">A catalogue of 270+ real products with specifications, per-kilo pricing and live stock; cart, wishlist and order tracking from pending to delivered; Razorpay payments with automatic refunds on cancellation; and an admin panel for analytics, warehouse inventory and fulfilment.</p>
+        </div>
+      </section>
+
+      <section class="cs-flow" data-theme="light">
+        <p class="eyebrow mono js-decode">Sequence</p>
+        <h2 class="cs-h2 js-lines">Checkout across two databases</h2>
+        <ol class="cs-flow__list">
+          <li class="cs-step js-step"><span class="cs-step__n">01</span><h3 class="cs-step__title">Validate the buyer</h3><p class="cs-step__text">User and delivery address are checked against the auth database.</p></li>
+          <li class="cs-step js-step"><span class="cs-step__n">02</span><h3 class="cs-step__title">Read the catalogue</h3><p class="cs-step__text">Current prices and stock come from the separate catalogue database.</p></li>
+          <li class="cs-step js-step"><span class="cs-step__n">03</span><h3 class="cs-step__title">Reserve stock</h3><p class="cs-step__text">A conditional update reserves quantity only where available stock covers the order.</p></li>
+          <li class="cs-step js-step"><span class="cs-step__n">04</span><h3 class="cs-step__title">Create the order</h3><p class="cs-step__text">With stock held, the order is written to the auth database.</p></li>
+          <li class="cs-step js-step"><span class="cs-step__n">05</span><h3 class="cs-step__title">Compensate on failure</h3><p class="cs-step__text">If anything fails after reservation, the held stock is restored. A race never leaves phantom reservations.</p></li>
+        </ol>
+      </section>
+
+      <section class="cs-figures" data-theme="light">
+        <div class="cs-figure js-figure"><span class="cs-figure__n">270+</span><span class="cs-figure__l mono">real product listings</span></div>
+        <div class="cs-figure js-figure"><span class="cs-figure__n">2</span><span class="cs-figure__l mono">isolated PostgreSQL databases</span></div>
+        <div class="cs-figure js-figure"><span class="cs-figure__n">15 min</span><span class="cs-figure__l mono">access-token lifetime</span></div>
+        <div class="cs-figure js-figure"><span class="cs-figure__n">1</span><span class="cs-figure__l mono">codebase for web and Android</span></div>
+      </section>
+
+      <section class="cs-decisions" data-theme="dark">
+        <h2 class="eyebrow mono js-decode">Decisions worth noting</h2>
+        <div class="cs-decisions__grid">
+          <article class="cs-decision js-fade"><h3>Split auth from catalogue</h3><p>Credentials and payment data sit physically apart from the public catalogue, and catalogue reads scale without touching transactional writes.</p></article>
+          <article class="cs-decision js-fade"><h3>Rotate refresh tokens</h3><p>Short-lived access tokens, 30-day refresh tokens that rotate on use, and Argon2id hashing that migrates older bcrypt hashes when users sign in.</p></article>
+          <article class="cs-decision js-fade"><h3>Verify every payment</h3><p>Razorpay webhooks are checked with HMAC SHA-256 before an order is marked paid. Cancelling an order refunds it and restores inventory.</p></article>
+        </div>
+      </section>
+
+      <section class="cs-gallery" data-theme="dark">
+        <div class="cs-gallery__head">
+          <h2 class="eyebrow mono js-decode">Gallery</h2>
+          <p class="cs-gallery__count mono"><span class="js-gcount">01</span> / 02</p>
+        </div>
+        <div class="cs-gallery__track">
+          <figure class="hfig"><div class="shot__frame"><img src="/img/steel-products.webp" width="1600" height="900" alt="Product catalogue with steel pipe categories" loading="lazy" decoding="async" /></div><figcaption class="mono">Catalogue and category navigation</figcaption></figure>
+          <figure class="hfig"><div class="shot__frame"><img src="/img/steel-login.webp" width="1600" height="900" alt="Sign-in page with Google sign-in" loading="lazy" decoding="async" /></div><figcaption class="mono">Sign-in: email, Google or phone OTP</figcaption></figure>
+        </div>
+      </section>
+
+      <section class="cs-stack" data-theme="dark">
+        <h2 class="eyebrow mono js-decode">Built with</h2>
+        <dl class="spec__table cs-stack__table mono js-stagger">
+          <div><dt>Frontend</dt><dd>React 19, Vite, Tailwind CSS v4, Zustand, TanStack Query, React Router</dd></div>
+          <div><dt>Backend</dt><dd>Node.js 20, Express 5, Prisma (two clients), Zod</dd></div>
+          <div><dt>Data</dt><dd>PostgreSQL 16 on Neon, two databases</dd></div>
+          <div><dt>Auth</dt><dd>JWT with rotation, Firebase Google Sign-In, phone OTP, reCAPTCHA v3</dd></div>
+          <div><dt>Payments</dt><dd>Razorpay with HMAC-verified webhooks</dd></div>
+          <div><dt>Messaging</dt><dd>Resend email, Fast2SMS OTP</dd></div>
+          <div><dt>Mobile</dt><dd>Capacitor Android build</dd></div>
+          <div><dt>Deploy</dt><dd>Vercel, Render, Neon</dd></div>
+        </dl>
+        <div class="spec__links">
+          <a class="btn " href="https://amk-steels.vercel.app" target="_blank" rel="noopener" data-magnetic><span class="js-roll">Visit live site</span> <span>↗</span></a>
+          <a class="btn btn--ghost" href="https://github.com/Boovesh985/Steel-E-Commerce-platform" target="_blank" rel="noopener" data-magnetic><span class="js-roll">Source</span> <span>↗</span></a>
+        </div>
+      </section>
+
+      <section class="cs-next" data-shape="2" data-theme="dark">
+        <a href="/projects/clinical-agents/" data-transition="Multi-Agent Clinical Reasoning" class="cs-next__link" data-cursor="Next" data-burst>
+          <span class="eyebrow mono">Next project</span>
+          <span class="cs-next__title">Multi-Agent<br />Clinical Reasoning</span>
+          <span class="cs-next__label mono">Agentic AI · Healthcare</span>
+        </a>
+        <footer class="footer mono">
+          <span>© 2026 Booveshwaran T</span>
+          <a href="/" data-transition="Home" class="js-roll">Home</a>
+          <a href="#top" class="js-roll">Back to top ↑</a>
+        </footer>
+      </section>
+    </main>
+
+  </body>
+</html>
