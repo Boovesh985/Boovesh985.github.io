@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Booveshwaran T — AI & Full-Stack Engineer</title>
-    <meta name="description" content="Booveshwaran T builds AI systems and full-stack products: a steel e-commerce platform, a multi-agent clinical reasoning system, and a 1D-CNN that diagnoses encrypted ECGs." />
+    <meta name="description" content="Booveshwaran T builds AI systems and full-stack products: a steel e-commerce platform, Moviq (streaming with ML recommendations and a spoiler shield), a multi-agent clinical reasoning system, and a 1D-CNN that diagnoses encrypted ECGs." />
     <meta name="theme-color" content="#D3D6D8" />
     <meta property="og:title" content="Booveshwaran T — AI & Full-Stack Engineer" />
     <meta property="og:description" content="AI systems and full-stack products, built to be correct." />
@@ -99,7 +99,7 @@
               I'm Booveshwaran T, a final-year B.Tech Computer Science and Engineering student at SASTRA University, specialising in Artificial Intelligence and Data Science. I graduate in May 2027.
             </p>
             <p class="js-fade">
-              My work sits where machine learning meets production engineering. I've shipped a steel e-commerce platform to the web and Android, built a five-agent clinical reasoning system with LangGraph and retrieval-augmented generation, and co-developed a 1D-CNN that diagnoses heart arrhythmias on homomorphically encrypted ECG data.
+              My work sits where machine learning meets production engineering. I've shipped a steel e-commerce platform to the web and Android, built Moviq, a streaming and film-diary app whose recommender and spoiler models retrain themselves from live data, built a five-agent clinical reasoning system with LangGraph and retrieval-augmented generation, and co-developed a 1D-CNN that diagnoses heart arrhythmias on homomorphically encrypted ECG data.
             </p>
             <p class="js-fade">
               I care about software that holds up under real conditions: consistent transactions, secure authentication, measurable model quality, and decisions that can be explained. I'm looking for internship and graduate roles in AI engineering, machine learning and full-stack development.
@@ -159,7 +159,7 @@
       <section class="work" id="work">
         <div class="work__head" data-shape="0" data-theme="dark">
           <p class="eyebrow mono js-decode">Selected work</p>
-          <h2 class="work__title js-lines">Three systems,<br />three kinds of <span class="temper-text">hard</span>.</h2>
+          <h2 class="work__title js-lines">Four systems,<br />four kinds of <span class="temper-text">hard</span>.</h2>
         </div>
 
         <!-- Chapter: Steel -->
@@ -283,6 +283,49 @@
             </figure>
           </div>
         </article>
+
+        <!-- Chapter: Moviq -->
+        <article class="chapter" data-shape="5" data-theme="dark" data-accent="blue">
+          <div class="chapter__intro">
+            <p class="chapter__label mono js-decode">Full-stack + ML · Streaming &amp; film diary</p>
+            <h3 class="chapter__title"><a href="/projects/moviq/" data-transition="Moviq" data-cursor="Case study" data-burst class="js-lines">Moviq</a></h3>
+            <p class="chapter__line js-fade">Pick a film in a minute, and read reviews without the ending ruined.</p>
+          </div>
+          <div class="chapter__body">
+            <figure class="shot js-shot" data-cursor="Live demo">
+              <a href="https://moviq-beta.vercel.app" target="_blank" rel="noopener">
+                <div class="shot__frame"><img src="/img/moviq/card.webp" width="1600" height="1000" alt="Moviq: watch, review and decide what’s next. Spoiler Shield, Decide in 60s, Group pick" loading="lazy" decoding="async" /></div>
+              </a>
+              <figcaption class="mono">Live demo: moviq-beta.vercel.app, guest mode needs no sign-up</figcaption>
+            </figure>
+            <div class="spec">
+              <p class="spec__lede js-fade">Netflix-style streaming meets a Letterboxd-style film diary. A FastAPI ML service recommends films, blurs the spoilers in reviews, and keeps retraining itself from the live database.</p>
+              <ul class="spec__points js-stagger">
+                <li>The Spoiler Shield reads reviews sentence by sentence and blurs only the ones that give the plot away. Every reader’s “was this a spoiler?” answer becomes training data.</li>
+                <li>A hybrid recommender with learned blend weights finds 1.43× more of the films people go on to love than a popularity baseline, tested on real MovieLens raters.</li>
+                <li>Decide gives exactly three picks in 60 seconds, each with a reason. Group pick lets friends swipe on a shortlist built from everyone’s taste.</li>
+              </ul>
+              <dl class="spec__table mono js-stagger">
+                <div><dt>Frontend</dt><dd>React 19, React Router, Vite</dd></div>
+                <div><dt>Backend</dt><dd>Node.js, Express 5, PostgreSQL</dd></div>
+                <div><dt>ML</dt><dd>FastAPI, scikit-learn, SciPy</dd></div>
+                <div><dt>Models</dt><dd>Hybrid recommender, TF-IDF + logistic regression</dd></div>
+                <div><dt>Deploy</dt><dd>Vercel, Render, Neon</dd></div>
+              </dl>
+              <div class="spec__links">
+                <a class="btn" href="/projects/moviq/" data-transition="Moviq" data-magnetic><span class="js-roll">Read case study</span> <span>→</span></a>
+                <a class="btn btn--ghost" href="https://moviq-beta.vercel.app" target="_blank" rel="noopener" data-magnetic><span class="js-roll">Live demo</span> <span>↗</span></a>
+                <a class="btn btn--ghost" href="https://github.com/Boovesh985/Moviq" target="_blank" rel="noopener" data-magnetic><span class="js-roll">Source</span> <span>↗</span></a>
+              </div>
+            </div>
+            <figure class="shot shot--secondary js-shot" data-cursor="Live demo">
+              <a href="https://moviq-beta.vercel.app" target="_blank" rel="noopener">
+                <div class="shot__frame"><img src="/img/moviq/signin.webp" width="1600" height="1000" alt="Moviq sign-in page over a wall of film posters, with guest and demo options" loading="lazy" decoding="async" /></div>
+              </a>
+              <figcaption class="mono">Sign in, or try it as a guest</figcaption>
+            </figure>
+          </div>
+        </article>
       </section>
 
       <!-- ARCHIVE -->
@@ -358,7 +401,7 @@
             <div class="stack__col"><h3 class="mono">Frontend</h3><p>React, Tailwind CSS, HTML/CSS, Three.js, GSAP</p></div>
             <div class="stack__col"><h3 class="mono">Backend</h3><p>Node.js, Express, FastAPI, Django, REST APIs, Prisma</p></div>
             <div class="stack__col"><h3 class="mono">Data</h3><p>PostgreSQL, MongoDB, MySQL, Power BI, Excel</p></div>
-            <div class="stack__col"><h3 class="mono">AI &amp; ML</h3><p>LangGraph, LangChain, FAISS, SentenceTransformers, TensorFlow, SHAP, TenSEAL</p></div>
+            <div class="stack__col"><h3 class="mono">AI &amp; ML</h3><p>LangGraph, LangChain, FAISS, SentenceTransformers, scikit-learn, TensorFlow, SHAP, TenSEAL</p></div>
             <div class="stack__col"><h3 class="mono">Tools</h3><p>Git, GitHub, Docker, Capacitor, Vercel, Render, Hugging Face</p></div>
           </div>
         </div>

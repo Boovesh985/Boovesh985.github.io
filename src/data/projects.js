@@ -161,4 +161,58 @@ export const projects = [
       ['App', 'Streamlit on Hugging Face Spaces (Docker)'],
     ],
   },
+  {
+    slug: 'moviq',
+    shape: 5,
+    accent: 'blue',
+    title: ['Moviq'],
+    label: 'Full-stack + ML · Streaming & film diary',
+    year: '2026',
+    summary:
+      'Netflix-style streaming meets a Letterboxd-style film diary, with three things neither has: a Spoiler Shield that blurs only the sentences that give the plot away, three picks in 60 seconds, and a group pick for friends. Its models keep learning from the live database.',
+    links: [
+      { label: 'Try the live demo', href: 'https://moviq-beta.vercel.app' },
+      { label: 'Source', href: 'https://github.com/Boovesh985/Moviq' },
+    ],
+    stackShort: 'React 19 · Express 5 · PostgreSQL · FastAPI · scikit-learn',
+    cover: { src: '/img/moviq/card.webp', alt: 'Moviq: watch, review and decide what’s next. Spoiler Shield, Decide in 60s, Group pick' },
+    problem:
+      "Choosing what to watch takes longer than watching. Reviews that would help are full of spoilers, recommendations never say why, and picking a film with friends turns into a group chat that doesn't end.",
+    built:
+      'A React app for browsing, streaming free films, keeping a diary and writing reviews; an Express API on PostgreSQL; and a FastAPI ML service with a hybrid recommender, a sentence-level spoiler classifier and sentiment by aspect. A background learner retrains each model as new labels arrive, and a public page shows every model’s live metrics and every retrain.',
+    flowTitle: 'How Moviq keeps learning',
+    flow: [
+      ['Collect signals', 'Ratings, likes, watches and reviews feed the recommender. Readers who reveal a blurred sentence answer "was this a spoiler?", and every answer becomes a label.'],
+      ['Score new reviews', 'Every two minutes a background thread scores new and edited reviews: spoiler spans, overall sentiment, and sentiment for acting, story, pacing and more.'],
+      ['Retrain on thresholds', 'The Spoiler Shield retrains after 5 new sentence labels, sentiment after 20 rated reviews, and the recommender’s blend weights after 25 new ratings.'],
+      ['Gate the candidate', 'Candidate and live model are scored on the same validation set, split by hash so it stays stable. The candidate ships only if it is at least as good.'],
+      ['Log every run', 'Shipped or rejected, every retrain is recorded with its metrics and why it ran, and shown on the public “How Moviq learns” page.'],
+    ],
+    figures: [
+      ['1.43×', 'more future favourites found than a popularity baseline'],
+      ['95.3%', 'sentiment accuracy on unseen film reviews'],
+      ['84%', 'Spoiler Shield precision on held-out sentences'],
+      ['68k', 'real ratings from 610 MovieLens raters'],
+    ],
+    decisionsTitle: 'Decisions worth noting',
+    decisions: [
+      ['Let the gate say no', 'A film-specialist spoiler ensemble beat the live model on film reviews but lost on the combined score (0.476 vs 0.492), so the gate rejected it. The rule was set before the result was known.'],
+      ['Tune for precision, not F1', 'A harmless sentence blurred on every review hurts more than an occasional miss, so the threshold maximises F0.5 at a realistic spoiler rate. It blurs about 4% of sentences instead of 16%.'],
+      ['Never make a visitor wait for the ML', 'The ML service sleeps on free hosting. A 4-second timeout and a circuit breaker switch every feature to a fallback, so a cold start still loads the home page in 0.7 s.'],
+    ],
+    gallery: [
+      { src: '/img/moviq/signin.webp', alt: 'Moviq sign-in page over a wall of film posters, with guest and demo options', caption: 'Sign in, or try it as a guest with no sign-up' },
+      { src: '/img/moviq/arch.webp', alt: 'Architecture: React client and Express API on Vercel, FastAPI ML service with a learner thread on Render, PostgreSQL on Neon', caption: 'Architecture: API on Vercel, ML on Render, Postgres on Neon', paper: true },
+      { src: '/img/moviq/eval.webp', alt: 'Bar chart of Recall@10 by model: learned blend 0.111, hand-set weights 0.104, PureSVD 0.086, popularity 0.078, item-item CF 0.074, content 0.036', caption: 'Recall@10 on real raters: the learned blend wins', paper: true },
+    ],
+    stack: [
+      ['Frontend', 'React 19, React Router, Vite, plain CSS'],
+      ['Backend', 'Node.js, Express 5, PostgreSQL (pg), JWT in httpOnly cookies'],
+      ['ML service', 'Python, FastAPI, scikit-learn, SciPy'],
+      ['Recommender', 'Content TF-IDF, item-item CF, PureSVD, popularity, learned blend weights'],
+      ['Text models', 'TF-IDF + logistic regression for spoilers and sentiment by aspect'],
+      ['Data', 'MovieLens, TMDB reviews, IMDb and Goodreads datasets for training'],
+      ['Deploy', 'Vercel (site + API), Render (ML), Neon (Postgres)'],
+    ],
+  },
 ]

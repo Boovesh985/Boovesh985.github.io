@@ -1,6 +1,6 @@
 import { BufferAttribute, BufferGeometry, Group, HalfFloatType, LinearFilter, LinearSRGBColorSpace, Mesh, NoBlending, OrthographicCamera, PerspectiveCamera, PlaneGeometry, Points, Scene, ShaderMaterial, Sphere, Vector2, Vector3, WebGLRenderTarget, WebGLRenderer } from 'three'
 import gsap from 'gsap'
-import { sphere, pipes, network, heart, spiral } from './shapes.js'
+import { sphere, pipes, network, heart, spiral, reel } from './shapes.js'
 import { particlesVert, particlesFrag, quadVert, trailFrag, postFrag } from './shaders.js'
 import { precompile, quietShaders } from './warm.js'
 
@@ -66,7 +66,7 @@ export class GL {
     const n = this.isMobile ? 12000 : 24000
     this.count = n
     const g = new BufferGeometry()
-    const shapes = [sphere(n), pipes(n), network(n), heart(n), spiral(n)]
+    const shapes = [sphere(n), pipes(n), network(n), heart(n), spiral(n), reel(n)]
     g.setAttribute('position', new BufferAttribute(shapes[0], 3))
     shapes.forEach((s, i) => g.setAttribute('aP' + i, new BufferAttribute(s, 3)))
     const rand = new Float32Array(n * 4)
@@ -74,7 +74,7 @@ export class GL {
     g.setAttribute('aRand', new BufferAttribute(rand, 4))
     g.boundingSphere = new Sphere(new Vector3(), 10)
 
-    this.weights = [1, 0, 0, 0, 0]
+    this.weights = [1, 0, 0, 0, 0, 0]
     this.pMat = new ShaderMaterial({
       vertexShader: particlesVert,
       fragmentShader: particlesFrag,
@@ -180,6 +180,7 @@ export class GL {
       { x: m ? 0 : 1.35, y: m ? 1.0 : 0, s: m ? 0.55 : 0.75 },
       { x: m ? 0 : 1.6, y: m ? 0.95 : 0, s: m ? 0.62 : 0.85 },
       { x: m ? 0 : 1.2, y: 0, s: m ? 0.7 : 0.9 },
+      { x: m ? -0.1 : 1.0, y: m ? 1.0 : 0, s: m ? 0.47 : 0.72 }, // reel + strip runs wide
     ]
     // Case-study pages have a wider title column, so shapes sit further right and smaller.
     if (this.page === 'project' && !m && i > 0) return { ...L[i], x: L[i].x + 0.35, s: L[i].s * 0.78 }

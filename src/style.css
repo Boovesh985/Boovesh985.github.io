@@ -260,6 +260,7 @@ html.nav-hidden .nav { translate: 0 -110%; }
 .chapter[data-accent='straw'] .chapter__label { color: var(--straw); }
 .chapter[data-accent='violet'] .chapter__label { color: #9a78d4; }
 .chapter[data-accent='bronze'] .chapter__label { color: #de8a55; }
+.chapter[data-accent='blue'] .chapter__label { color: #7fa2e6; }
 .chapter__title {
   font-family: var(--display); font-weight: 900; text-transform: uppercase;
   font-size: clamp(60px, 9.2vw, 176px); line-height: 0.84; margin: 0;
@@ -461,6 +462,7 @@ html.is-arriving .curtain__inner { opacity: 0; }
 .cs[data-accent='straw'] .chapter__label { color: var(--straw); }
 .cs[data-accent='violet'] .chapter__label { color: #9a78d4; }
 .cs[data-accent='bronze'] .chapter__label { color: #de8a55; }
+.cs[data-accent='blue'] .chapter__label { color: #7fa2e6; }
 .cs-title {
   font-family: var(--display); font-weight: 900; text-transform: uppercase;
   font-size: clamp(64px, 10.5vw, 200px); line-height: 0.84; margin: 0; overflow: hidden; padding-top: 0.05em;

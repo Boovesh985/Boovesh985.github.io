@@ -7,7 +7,7 @@ Personal portfolio of an AI engineer and full-stack developer: agentic AI system
 ## What's inside
 
 - **Decrypt hero.** The name renders as ciphertext, and the cursor trail reveals it in tempered-steel colours (a nod to the encrypted-ECG project). On touch screens it sweeps on its own.
-- **Morphing particle field** (Three.js, custom shaders). About 24k points (12k on phones) reshape per section: planet → steel pipe bundle → multi-agent graph → heart with ECG trace → spiral. A GPU mouse-trail buffer bends and colour-splits them.
+- **Morphing particle field** (Three.js, custom shaders). About 24k points (12k on phones) reshape per section: planet → steel pipe bundle → multi-agent graph → heart with ECG trace → film reel → spiral. A GPU mouse-trail buffer bends and colour-splits them.
 - **The Voyage.** A scroll-driven dive with a 3D astronaut through five layers of the stack: interface, services, data, models and ciphertext. Click or tap to make the astronaut flip.
 - **3D props** that live inside the page: typing keycaps for the toolkit, a graduation cap, and a waving astronaut by the contact section.
 - **Scroll choreography** (GSAP ScrollTrigger + SplitText, Lenis smooth scroll): line masks, word scrubs, clip-path image reveals and counters.

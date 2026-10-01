@@ -56,7 +56,7 @@ uniform float uOpacity;
 uniform float uMouseStrength;
 uniform float uBurst;
 uniform float uAttract;
-uniform float uW[5];
+uniform float uW[6];
 uniform vec3 uMouse;
 uniform vec3 uInk;
 uniform vec3 uSteel;
@@ -70,6 +70,7 @@ attribute vec3 aP1;
 attribute vec3 aP2;
 attribute vec3 aP3;
 attribute vec3 aP4;
+attribute vec3 aP5;
 attribute vec4 aRand;
 
 varying vec3 vColor;
@@ -85,8 +86,8 @@ vec3 temper(float t){
 }
 
 void main(){
-  vec3 p = aP0 * uW[0] + aP1 * uW[1] + aP2 * uW[2] + aP3 * uW[3] + aP4 * uW[4];
-  float peak = max(max(max(uW[0], uW[1]), max(uW[2], uW[3])), uW[4]);
+  vec3 p = aP0 * uW[0] + aP1 * uW[1] + aP2 * uW[2] + aP3 * uW[3] + aP4 * uW[4] + aP5 * uW[5];
+  float peak = max(max(max(uW[0], uW[1]), max(uW[2], uW[3])), max(uW[4], uW[5]));
   float chaos = clamp((1.0 - peak) * 2.2, 0.0, 1.2);
 
   float t = uTime * 0.22;

@@ -17,6 +17,16 @@ function rotate(arr, rx, ry, rz = 0) {
   return arr
 }
 
+// Shapes built in parts (heart + trace, reel + strip) are shuffled point by point, so when a slow
+// device draws only the first part of the buffer, every part of the shape survives.
+function shuffle(arr) {
+  for (let i = arr.length / 3 - 1; i > 0; i--) {
+    const j = (Math.random() * (i + 1)) | 0
+    for (let k = 0; k < 3; k++) { const t = arr[i * 3 + k]; arr[i * 3 + k] = arr[j * 3 + k]; arr[j * 3 + k] = t }
+  }
+  return arr
+}
+
 function onSphere() {
   const u = Math.random() * 2 - 1
   const t = Math.random() * TAU
@@ -167,7 +177,7 @@ export function heart(n) {
     a[i * 3 + 1] = y + (Math.random() - 0.5) * 0.02
     a[i * 3 + 2] = 0.4 + (Math.random() - 0.5) * 0.04
   }
-  return rotate(a, 0.05, 0, 0)
+  return shuffle(rotate(a, 0.05, 0, 0))
 }
 
 // 4 — Spiral: a three-arm disc for the closing sections.
@@ -183,4 +193,63 @@ export function spiral(n) {
     a[i * 3 + 2] = Math.sin(ang) * r + spread
   }
   return rotate(a, 1.05, 0, 0.3)
+}
+
+// 5 — Moviq: a film reel with a strip of film unspooling from it.
+export function reel(n) {
+  const a = new Float32Array(n * 3)
+  const R = 1.3
+  const holes = Array.from({ length: 5 }, (_, k) => {
+    const t = (k / 5) * TAU + 0.3
+    return [Math.cos(t) * 0.74, Math.sin(t) * 0.74]
+  })
+  const HR = 0.29
+  const inHole = (x, y) => holes.some(([hx, hy]) => (x - hx) ** 2 + (y - hy) ** 2 < HR * HR)
+  const cx = -0.95, cy = 0.25 // reel centre; the strip runs off to the right
+  const nReel = Math.floor(n * 0.62)
+  let i = 0
+  while (i < nReel) {
+    const k = Math.random()
+    let x, y
+    if (k < 0.34) {
+      // outlines: rim, the five windows, the hub
+      const o = Math.random()
+      const t = Math.random() * TAU
+      if (o < 0.45) { const r = R - Math.random() * 0.05; x = Math.cos(t) * r; y = Math.sin(t) * r }
+      else if (o < 0.88) { const [hx, hy] = holes[(Math.random() * 5) | 0]; x = hx + Math.cos(t) * HR; y = hy + Math.sin(t) * HR }
+      else { const r = 0.2; x = Math.cos(t) * r; y = Math.sin(t) * r }
+    } else {
+      // the face of the reel, with the windows and the axle left open
+      const r = Math.sqrt(Math.random()) * R
+      const t = Math.random() * TAU
+      x = Math.cos(t) * r; y = Math.sin(t) * r
+      if (r < 0.1 || inHole(x, y)) continue
+    }
+    const z = (Math.random() < 0.5 ? -1 : 1) * 0.06 + (Math.random() - 0.5) * 0.015
+    a[i * 3] = x + cx; a[i * 3 + 1] = y + cy; a[i * 3 + 2] = z
+    i++
+  }
+  // the strip leaves the bottom of the reel, runs right and curls through depth
+  const a0 = -1.25
+  const P = [cx + Math.cos(a0) * R, cy + Math.sin(a0) * R]
+  const L = 3.4, W = 0.24, frames = 11
+  for (; i < n; i++) {
+    let s = Math.random(), u
+    const k = Math.random()
+    if (k < 0.42) u = (Math.random() < 0.5 ? -1 : 1) * (0.97 + Math.random() * 0.03) // edges
+    else if (k < 0.62) { s = (Math.round(s * frames) + (Math.random() - 0.5) * 0.04) / frames; u = Math.random() * 1.3 - 0.65 } // frame lines
+    else {
+      u = Math.random() * 2 - 1
+      // sprocket holes along both edges
+      if (Math.abs(u) > 0.74 && Math.abs(u) < 0.9 && ((s * frames * 3) % 1) < 0.5) { i--; continue }
+    }
+    const x = P[0] + s * L
+    const y = P[1] + Math.sin(s * Math.PI * 1.2) * 0.55 - s * 0.35
+    const z = Math.sin(s * Math.PI) * 0.7
+    const tw = s * 1.1 // the strip twists as it travels
+    a[i * 3] = x
+    a[i * 3 + 1] = y + u * W * Math.cos(tw)
+    a[i * 3 + 2] = z + u * W * Math.sin(tw)
+  }
+  return shuffle(rotate(a, 0.22, -0.32, 0.04))
 }
