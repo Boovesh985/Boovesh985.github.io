@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Moviq — Booveshwaran T</title>
+    <meta name="description" content="Netflix-style streaming meets a Letterboxd-style film diary, with three things neither has: a Spoiler Shield that blurs only the sentences that give the plot away, three picks in 60 seconds, and a group pick for friends. Its models keep learning from the live database." />
+    <meta name="theme-color" content="#0E1114" />
+    <meta property="og:title" content="Moviq — Booveshwaran T" />
+    <meta property="og:description" content="Netflix-style streaming meets a Letterboxd-style film diary, with three things neither has: a Spoiler Shield that blurs only the sentences that give the plot away, three picks in 60 seconds, and a group pick for friends. Its models keep learning from the live database." />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://boovesh985.github.io/projects/moviq/" />
+    <meta property="og:image" content="https://boovesh985.github.io/og.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href="https://boovesh985.github.io/projects/moviq/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <script>try{if(sessionStorage.getItem('bt-transition'))document.documentElement.classList.add('is-arriving')}catch(e){}</script>
+    <script type="module" crossorigin src="/assets/main-Bdw-A63E.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/main-CZftEu58.css">
+  </head>
+  <body data-page="project" data-shape="5">
+    <div class="curtain" aria-hidden="true"><div class="curtain__inner"><span class="curtain__eyebrow mono">Opening</span><span class="curtain__label"></span></div></div>
+    <div class="wipe" aria-hidden="true"></div>
+    <canvas class="gl" aria-hidden="true"></canvas>
+    <div class="cursor" aria-hidden="true"><div class="cursor__ring"><span class="cursor__label"></span></div><div class="cursor__dot"></div></div>
+
+    <header class="nav">
+      <a href="/" class="nav__brand" data-transition="Home" data-magnetic aria-label="Home">
+        <span class="nav__mark">BT</span>
+        <span class="nav__name mono js-hover-scramble">Booveshwaran T</span>
+      </a>
+      <nav class="nav__links mono" aria-label="Primary">
+        <a href="/#work" data-transition="Selected work" class="js-roll">Work</a>
+        <a href="/#about" data-transition="About" class="js-roll">About</a>
+        <a href="/#contact" data-transition="Contact" class="js-roll">Contact</a>
+      </nav>
+      <div class="nav__time mono"><span class="dot"></span><span class="js-clock">--:--</span> IST</div>
+    </header>
+
+    <main id="top" class="cs" data-accent="blue">
+      <section class="cs-hero" data-shape="5" data-theme="dark">
+        <a class="cs-back mono js-hero-fade" href="/#work" data-transition="Selected work">← All work</a>
+        <div class="cs-hero__main">
+          <p class="chapter__label mono js-decode">Full-stack + ML · Streaming &amp; film diary</p>
+          <h1 class="cs-title" aria-label="Moviq">
+            <span class="hero__name-inner"><span class="hero__layer hero__layer--cipher" aria-hidden="true">Moviq</span><span class="hero__layer hero__layer--plain" aria-hidden="true">Moviq</span></span>
+          </h1>
+          <p class="cs-summary js-hero-fade">Netflix-style streaming meets a Letterboxd-style film diary, with three things neither has: a Spoiler Shield that blurs only the sentences that give the plot away, three picks in 60 seconds, and a group pick for friends. Its models keep learning from the live database.</p>
+        </div>
+        <dl class="cs-meta mono js-hero-fade">
+          <div><dt>Year</dt><dd>2026</dd></div>
+          <div><dt>Discipline</dt><dd>Full-stack + ML · Streaming &amp; film diary</dd></div>
+          <div><dt>Stack</dt><dd>React 19 · Express 5 · PostgreSQL · FastAPI · scikit-learn</dd></div>
+          <div><dt>Links</dt><dd><a href="https://moviq-beta.vercel.app" target="_blank" rel="noopener">Try the live demo ↗</a><br /><a href="https://github.com/Boovesh985/Moviq" target="_blank" rel="noopener">Source ↗</a></dd></div>
+        </dl>
+      </section>
+
+      <section class="cs-cover" data-shape="5" data-theme="dark">
+        <figure class="shot js-cover"><div class="shot__frame cs-cover__frame"><img src="/img/moviq/card.webp" width="1600" height="1000" alt="Moviq: watch, review and decide what’s next. Spoiler Shield, Decide in 60s, Group pick" loading="lazy" decoding="async" /></div></figure>
+      </section>
+
+      <section class="cs-overview" data-theme="dark">
+        <div class="cs-overview__col">
+          <h2 class="eyebrow mono js-decode">The problem</h2>
+          <p class="cs-lead js-fade">Choosing what to watch takes longer than watching. Reviews that would help are full of spoilers, recommendations never say why, and picking a film with friends turns into a group chat that doesn't end.</p>
+        </div>
+        <div class="cs-overview__col">
+          <h2 class="eyebrow mono js-decode">What I built</h2>
+          <p class="cs-body js-fade">A React app for browsing, streaming free films, keeping a diary and writing reviews; an Express API on PostgreSQL; and a FastAPI ML service with a hybrid recommender, a sentence-level spoiler classifier and sentiment by aspect. A background learner retrains each model as new labels arrive, and a public page shows every model’s live metrics and every retrain.</p>
+        </div>
+      </section>
+
+      <section class="cs-flow" data-theme="light">
+        <p class="eyebrow mono js-decode">Sequence</p>
+        <h2 class="cs-h2 js-lines">How Moviq keeps learning</h2>
+        <ol class="cs-flow__list">
+          <li class="cs-step js-step"><span class="cs-step__n">01</span><h3 class="cs-step__title">Collect signals</h3><p class="cs-step__text">Ratings, likes, watches and reviews feed the recommender. Readers who reveal a blurred sentence answer &quot;was this a spoiler?&quot;, and every answer becomes a label.</p></li>
+          <li class="cs-step js-step"><span class="cs-step__n">02</span><h3 class="cs-step__title">Score new reviews</h3><p class="cs-step__text">Every two minutes a background thread scores new and edited reviews: spoiler spans, overall sentiment, and sentiment for acting, story, pacing and more.</p></li>
+          <li class="cs-step js-step"><span class="cs-step__n">03</span><h3 class="cs-step__title">Retrain on thresholds</h3><p class="cs-step__text">The Spoiler Shield retrains after 5 new sentence labels, sentiment after 20 rated reviews, and the recommender’s blend weights after 25 new ratings.</p></li>
+          <li class="cs-step js-step"><span class="cs-step__n">04</span><h3 class="cs-step__title">Gate the candidate</h3><p class="cs-step__text">Candidate and live model are scored on the same validation set, split by hash so it stays stable. The candidate ships only if it is at least as good.</p></li>
+          <li class="cs-step js-step"><span class="cs-step__n">05</span><h3 class="cs-step__title">Log every run</h3><p class="cs-step__text">Shipped or rejected, every retrain is recorded with its metrics and why it ran, and shown on the public “How Moviq learns” page.</p></li>
+        </ol>
+      </section>
+
+      <section class="cs-figures" data-theme="light">
+        <div class="cs-figure js-figure"><span class="cs-figure__n">1.43×</span><span class="cs-figure__l mono">more future favourites found than a popularity baseline</span></div>
+        <div class="cs-figure js-figure"><span class="cs-figure__n">95.3%</span><span class="cs-figure__l mono">sentiment accuracy on unseen film reviews</span></div>
+        <div class="cs-figure js-figure"><span class="cs-figure__n">84%</span><span class="cs-figure__l mono">Spoiler Shield precision on held-out sentences</span></div>
+        <div class="cs-figure js-figure"><span class="cs-figure__n">68k</span><span class="cs-figure__l mono">real ratings from 610 MovieLens raters</span></div>
+      </section>
+
+      <section class="cs-decisions" data-theme="dark">
+        <h2 class="eyebrow mono js-decode">Decisions worth noting</h2>
+        <div class="cs-decisions__grid">
+          <article class="cs-decision js-fade"><h3>Let the gate say no</h3><p>A film-specialist spoiler ensemble beat the live model on film reviews but lost on the combined score (0.476 vs 0.492), so the gate rejected it. The rule was set before the result was known.</p></article>
+          <article class="cs-decision js-fade"><h3>Tune for precision, not F1</h3><p>A harmless sentence blurred on every review hurts more than an occasional miss, so the threshold maximises F0.5 at a realistic spoiler rate. It blurs about 4% of sentences instead of 16%.</p></article>
+          <article class="cs-decision js-fade"><h3>Never make a visitor wait for the ML</h3><p>The ML service sleeps on free hosting. A 4-second timeout and a circuit breaker switch every feature to a fallback, so a cold start still loads the home page in 0.7 s.</p></article>
+        </div>
+      </section>
+
+      <section class="cs-gallery" data-theme="dark">
+        <div class="cs-gallery__head">
+          <h2 class="eyebrow mono js-decode">Gallery</h2>
+          <p class="cs-gallery__count mono"><span class="js-gcount">01</span> / 03</p>
+        </div>
+        <div class="cs-gallery__track">
+          <figure class="hfig"><div class="shot__frame"><img src="/img/moviq/signin.webp" width="1600" height="1000" alt="Moviq sign-in page over a wall of film posters, with guest and demo options" loading="lazy" decoding="async" /></div><figcaption class="mono">Sign in, or try it as a guest with no sign-up</figcaption></figure>
+          <figure class="hfig"><div class="shot__frame shot__frame--paper"><img src="/img/moviq/arch.webp" width="1600" height="700" alt="Architecture: React client and Express API on Vercel, FastAPI ML service with a learner thread on Render, PostgreSQL on Neon" loading="lazy" decoding="async" /></div><figcaption class="mono">Architecture: API on Vercel, ML on Render, Postgres on Neon</figcaption></figure>
+          <figure class="hfig"><div class="shot__frame shot__frame--paper"><img src="/img/moviq/eval.webp" width="1600" height="900" alt="Bar chart of Recall@10 by model: learned blend 0.111, hand-set weights 0.104, PureSVD 0.086, popularity 0.078, item-item CF 0.074, content 0.036" loading="lazy" decoding="async" /></div><figcaption class="mono">Recall@10 on real raters: the learned blend wins</figcaption></figure>
+        </div>
+      </section>
+
+      <section class="cs-stack" data-theme="dark">
+        <h2 class="eyebrow mono js-decode">Built with</h2>
+        <dl class="spec__table cs-stack__table mono js-stagger">
+          <div><dt>Frontend</dt><dd>React 19, React Router, Vite, plain CSS</dd></div>
+          <div><dt>Backend</dt><dd>Node.js, Express 5, PostgreSQL (pg), JWT in httpOnly cookies</dd></div>
+          <div><dt>ML service</dt><dd>Python, FastAPI, scikit-learn, SciPy</dd></div>
+          <div><dt>Recommender</dt><dd>Content TF-IDF, item-item CF, PureSVD, popularity, learned blend weights</dd></div>
+          <div><dt>Text models</dt><dd>TF-IDF + logistic regression for spoilers and sentiment by aspect</dd></div>
+          <div><dt>Data</dt><dd>MovieLens, TMDB reviews, IMDb and Goodreads datasets for training</dd></div>
+          <div><dt>Deploy</dt><dd>Vercel (site + API), Render (ML), Neon (Postgres)</dd></div>
+        </dl>
+        <div class="spec__links">
+          <a class="btn " href="https://moviq-beta.vercel.app" target="_blank" rel="noopener" data-magnetic><span class="js-roll">Try the live demo</span> <span>↗</span></a>
+          <a class="btn btn--ghost" href="https://github.com/Boovesh985/Moviq" target="_blank" rel="noopener" data-magnetic><span class="js-roll">Source</span> <span>↗</span></a>
+        </div>
+      </section>
+
+      <section class="cs-next" data-shape="1" data-theme="dark">
+        <a href="/projects/steel-commerce/" data-transition="Steel E-Commerce" class="cs-next__link" data-cursor="Next" data-burst>
+          <span class="eyebrow mono">Next project</span>
+          <span class="cs-next__title">Steel<br />E-Commerce</span>
+          <span class="cs-next__label mono">Full-stack · Web + Android</span>
+        </a>
+        <footer class="footer mono">
+          <span>© 2026 Booveshwaran T</span>
+          <a href="/" data-transition="Home" class="js-roll">Home</a>
+          <a href="#top" class="js-roll">Back to top ↑</a>
+        </footer>
+      </section>
+    </main>
+
+  </body>
+</html>
