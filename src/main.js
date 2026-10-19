@@ -484,6 +484,19 @@ function archivePreview() {
   if (!preview || !list || touch) return
   const track = $('.preview__track', preview)
 
+  // Habit heatmap preview: 26 weeks of check-ins, denser as the habit sticks
+  const heat = $('.pv-habit__grid')
+  if (heat) {
+    const shades = ['rgba(255,255,255,0.07)', 'rgba(226,176,79,0.3)', 'rgba(226,176,79,0.6)', '#e2b04f']
+    let cells = ''
+    for (let i = 0; i < 26 * 7; i++) {
+      const v = Math.sin(i * 12.9898) * 43758.5453
+      const r = v - Math.floor(v) + i / 260
+      cells += `<i style="background:${shades[r < 0.45 ? 0 : r < 0.75 ? 1 : r < 1.05 ? 2 : 3]}"></i>`
+    }
+    heat.innerHTML = cells
+  }
+
   // Flood-mask preview: a procedural three-class segmentation map
   const grid = $('.pv-flood__grid')
   if (grid) {

@@ -370,6 +370,13 @@ html.nav-hidden .nav { translate: 0 -110%; }
 .pv-bars__chart { flex: 1; display: flex; align-items: flex-end; gap: 16%; padding: 0 8%; border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
 .pv-bars__chart i { flex: 1; height: var(--h); background: var(--temper); border-radius: 3px 3px 0 0; }
 .pv-bars__labels { display: flex; justify-content: space-around; padding-top: 10px; font-size: 10px; }
+.pv-habit { background: var(--forge-2); padding: 24px 22px 20px; display: flex; flex-direction: column; gap: 16px; color: var(--mill); }
+.pv-habit__card { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 14px; border-radius: 6px; background: rgba(255, 255, 255, 0.06); }
+.pv-habit__card b { font-size: 15px; }
+.pv-habit__card span { font-size: 10px; color: var(--straw); }
+.pv-habit__grid { flex: 1; display: grid; grid-template-columns: repeat(26, 1fr); grid-template-rows: repeat(7, 1fr); grid-auto-flow: column; gap: 3px; }
+.pv-habit__grid i { border-radius: 2px; }
+.pv-habit > span { font-size: 10px; color: rgba(255, 255, 255, 0.7); }
 @media (hover: none) { .preview { display: none; } }
 
 /* ---------- Stack ---------- */
